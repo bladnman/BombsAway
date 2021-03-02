@@ -41,8 +41,8 @@ extension GameViewController {
     sceneView.backgroundColor = UIColor.black
     
     sceneView.debugOptions = [
-      SCNDebugOptions.showBoundingBoxes,
-      SCNDebugOptions.showWireframe,
+//      SCNDebugOptions.showBoundingBoxes,
+//      SCNDebugOptions.showWireframe,
 //      SCNDebugOptions.renderAsWireframe,
 //      SCNDebugOptions.showCreases,
     ]
@@ -73,7 +73,10 @@ extension GameViewController {
     scene.rootNode.addChildNode(cameraNode)
     
     // place the camera
-    cameraNode.position = SCNVector3(x: 0, y: 5, z: 15)
+    cameraNode.position = SCNVector3(x: 1, y: 8, z: -5)
+//    cameraNode.eulerAngles = SCNVector3(x: -toRadians(angle: 60), y: toRadians(angle: 20), z: 0)
+    cameraNode.eulerAngles = SCNVector3(x: -toRadians(angle: 60), y: 0, z: 0)
+
   }
 
   func createLights() {
@@ -98,10 +101,14 @@ extension GameViewController {
   }
   
   func createPlayer() {
-    let boxGeometry = SCNBox(width: 0.2, height: 0.2, length: 0.2, chamferRadius: 0.5)
-    boxGeometry.firstMaterial?.diffuse.contents = UIColor.red
+    let boxGeometry = SCNBox(width: 0.7, height: 0.1, length: 0.7, chamferRadius: 0.04)
+    boxGeometry.firstMaterial?.diffuse.contents = UIColor.white
+    boxGeometry.firstMaterial?.transparency = 0.8
+    boxGeometry.firstMaterial?.emission.intensity = 0.8
     let node = SCNNode(geometry: boxGeometry)
-    scene.rootNode.addChildNode(node)
+    playerNode = node
+    
+    gridNode.moveToGridPoint(playerNode, column: 7, row: 2)
   }
 }
 

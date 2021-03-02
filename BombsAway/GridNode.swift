@@ -12,14 +12,19 @@ class GridNode: SCNNode {
   let columns: Int
   let rows: Int
   let planeNode = SCNNode()
-  
+
   var gridlineColor = UIColor.white
   var gridlineRadius = 0.05
-  
+
   let top: CGFloat
   let right: CGFloat
   let bottom: CGFloat
   let left: CGFloat
+
+  let useNegativeZ = true
+  var zMod: Int {
+    return useNegativeZ ? -1 : 1
+  }
 
   convenience init(_ columns: Int, _ rows: Int) {
     self.init(columns: columns, rows: rows)
@@ -33,140 +38,128 @@ class GridNode: SCNNode {
     self.bottom = 0
     self.left = 0
     super.init()
-    
+
     addChildNode(planeNode)
 
-    drawGrid()
+    _drawGrid()
   }
 
-  func drawGrid() {
-    // set position of plane node
-    planeNode.position = SCNVector3(-Float(columns/2), Float(0.05), -Float(rows/2))
-    
-    
-//    _drawFrameWithPrimatives()
-//    _drawFrameWithLines()
+  // MARK: POSITIONERS
+
+  func moveToGridPoint(_ node: SCNNode, column: Int, row: Int) {
+    let newToGrid = node.parent != planeNode
+    if newToGrid {
+      planeNode.addChildNode(node)
+    }
+
+    let newPosition = _positionForGridPoint(column, row)
+
+    // JUST ADD NEW ITEMS
+    if newToGrid {
+      // cells are 0-index, thus -1s
+      node.position = newPosition
+    }
+
+    // MOVE ACTION
+    else {
+      node.removeAllActions()
+
+      let duration = 0.6
+      
+      let spinAngle:CGFloat = flipIsHeads() ? 90.0 : -90.0
+      
+      let spinAction = SCNAction.rotateBy(x: 0.0, y: toRadians(angle: spinAngle), z: 0, duration: duration)
+      spinAction.timingMode = .easeInEaseOut
+      node.runAction(spinAction)
+
+      let moveAction = SCNAction.move(to: newPosition, duration: duration)
+      moveAction.timingMode = .easeOut
+      node.runAction(moveAction, completionHandler: {
+        node.removeAllActions()
+      })
+    }
+  }
+
+  // MARK: GRID WORKERS
+
+  func _drawGrid() {
+    planeNode.position = SCNVector3(-Float(columns / 2), Float(0.05), -Float(rows / 2))
     _drawGridCells()
+    _numberCells()
   }
-  
-  func _drawGridCells() {
-    for c in 0..<columns {
-      for r in 0..<rows {
-        let geometry = SCNPlane(width: 1, height: 1)
-        let node = SCNNode(geometry: geometry);
 
-        node.position = SCNVector3(c, 0, r)
-        node.geometry?.firstMaterial?.diffuse.contents = UIColor.green
-        
-        node.rotation = SCNVector4Make(1, 0, 0, (.pi/2 * 3))
+  func _drawGridCells() {
+    for c in 1...columns {
+      for r in 1...rows {
+        let cellNode = GridCell(c, r)
+        // draw as if 0-indexed
+        cellNode.position = _positionForGridPoint(c, r)
+        cellNode.geometry?.firstMaterial?.diffuse.contents = UIColor.darkGray
+        cellNode.rotation = SCNVector4Make(1, 0, 0, .pi / 2 * 3)
+        planeNode.addChildNode(cellNode)
+      }
+    }
+  }
+
+  func _numberCells() {
+    for c in 1...columns {
+      for r in 1...rows {
+        let node = makeText(text: "\(c),\(r)",
+                            depthOfText: 5.0,
+                            color: UIColor.lightGray,
+                            transparency: 1.0)
+
+        node.position = _positionForGridPoint(c, r, andHeight: 0.1)
+        node.rotation = SCNVector4Make(1, 0, 0, .pi / 2 * 3)
+
         planeNode.addChildNode(node)
       }
     }
   }
-  
-  func _drawFrameWithPrimatives() {
-    let height = CGFloat(1.0)
-    // bottom line
-    addChildNode(lineBetweenNodes(
-      startPoint: SCNVector3(left, height, bottom),
-      endPoint: SCNVector3(right, height, bottom)
-    ))
-    // top line
-    addChildNode(lineBetweenNodes(
-      startPoint: SCNVector3(left, height, top),
-      endPoint: SCNVector3(right, height, top)
-    ))
-    // left line
-    addChildNode(lineBetweenNodes(
-      startPoint: SCNVector3(left, height, bottom),
-      endPoint: SCNVector3(left, height, top)
-    ))
-    // right line
-    addChildNode(lineBetweenNodes(
-      startPoint: SCNVector3(right, height, bottom),
-      endPoint: SCNVector3(right, height, top)
-    ))
+
+  func makeText(text: String, depthOfText: CGFloat, color: UIColor, transparency: CGFloat) -> SCNNode {
+    // 1. Create An SCNNode With An SCNText Geometry
+    let textNode = SCNNode()
+    let textGeometry = SCNText(string: text, extrusionDepth: depthOfText)
+
+    // 2. Set The Colour Of Our Text, Our Font & It's Size
+    textGeometry.firstMaterial?.diffuse.contents = color
+    textGeometry.firstMaterial?.isDoubleSided = true
+    textGeometry.font = UIFont(name: "Skia-Regular_Black", size: 100)
+    textGeometry.firstMaterial?.transparency = transparency
+
+    // 3. Set It's Flatness To 0 So It Looks Smooth
+    textGeometry.flatness = 0
+
+    // 4. Set The SCNNode's Geometry
+    textNode.geometry = textGeometry
+
+    // center the pivot point
+    let min = textNode.boundingBox.min
+    let max = textNode.boundingBox.max
+    let w = CGFloat(max.x - min.x)
+    let h = CGFloat(max.y - min.y)
+    let l = CGFloat(max.z - min.z)
+    textNode.pivot = SCNMatrix4MakeTranslation(Float(w / 2), Float(h / 2), Float(l / 2))
+
+    let scale = 0.02
+    textNode.scale = SCNVector3(scale, scale, scale)
+
+    return textNode
   }
 
-  func _drawFrameWithLines() {
-    let height = CGFloat(1.0)
-    // bottom line
-    addChildNode(getLineNode(
-      startPoint: SCNVector3(left, height, bottom),
-      endPoint: SCNVector3(right, height, bottom)
-    ))
-    // top line
-    addChildNode(getLineNode(
-      startPoint: SCNVector3(left, height, top),
-      endPoint: SCNVector3(right, height, top)
-    ))
-    // left line
-    addChildNode(getLineNode(
-      startPoint: SCNVector3(left, height, bottom),
-      endPoint: SCNVector3(left, height, top)
-    ))
-    // right line
-    addChildNode(getLineNode(
-      startPoint: SCNVector3(right, height, bottom),
-      endPoint: SCNVector3(right, height, top)
-    ))
-  }
-  
-  func lineBetweenNodes(startPoint: SCNVector3, endPoint: SCNVector3) -> SCNNode {
-    let vector = SCNVector3(startPoint.x - endPoint.x, startPoint.y - endPoint.y, startPoint.z - endPoint.z)
-    let distance = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
-    let midPosition = SCNVector3(x: (startPoint.x + endPoint.x) / 2, y: (startPoint.y + endPoint.y) / 2, z: (startPoint.z + endPoint.z) / 2)
+  // MARK: UTILS
 
-    let lineGeometry = SCNCylinder()
-    lineGeometry.radius = CGFloat(gridlineRadius)
-    lineGeometry.height = CGFloat(distance)
-    lineGeometry.radialSegmentCount = 5
-    
-    if let material = lineGeometry.firstMaterial {
-      material.diffuse.contents = gridlineColor
-      material.emission.contents = UIColor.white
-      material.emission.intensity = 0.8
-      //    lineGeometry.firstMaterial!.shininess = 1.0
-    }
-
-    let lineNode = SCNNode(geometry: lineGeometry)
-    lineNode.position = midPosition
-    lineNode.look(at: endPoint, up: worldUp, localFront: lineNode.worldUp)
-    return lineNode
+  func _positionForGridPoint(_ column: Int, _ row: Int) -> SCNVector3 {
+    return _positionForGridPoint(column, row, andHeight: 0.0)
   }
 
-  func getLineNode(startPoint: SCNVector3, endPoint: SCNVector3) -> SCNNode {
-    
-    let vertices: [SCNVector3] = [startPoint, endPoint]
-    let data = NSData(bytes: vertices, length: MemoryLayout<SCNVector3>.size * vertices.count) as Data
-         
-    let vertexSource = SCNGeometrySource(data: data,
-                                         semantic: .vertex,
-                                         vectorCount: vertices.count,
-                                         usesFloatComponents: true,
-                                         componentsPerVector: 3,
-                                         bytesPerComponent: MemoryLayout<Float>.size,
-                                         dataOffset: 0,
-                                         dataStride: MemoryLayout<SCNVector3>.stride)
-         
-    let indices: [Int32] = [0, 1]
-         
-    let indexData = NSData(bytes: indices, length: MemoryLayout<Int32>.size * indices.count) as Data
-         
-    let element = SCNGeometryElement(data: indexData,
-                                     primitiveType: .line,
-                                     primitiveCount: indices.count / 2,
-                                     bytesPerIndex: MemoryLayout<Int32>.size)
-        
-    let geometry = SCNGeometry(sources: [vertexSource], elements: [element])
-    let lineNode = SCNNode(geometry: geometry)
-    return lineNode
-//    return geometry
+  func _positionForGridPoint(_ column: Int, _ row: Int, andHeight: Float) -> SCNVector3 {
+    return SCNVector3(Float(column), andHeight, Float(row * zMod))
   }
+
   @available(*, unavailable)
-
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 }
-
