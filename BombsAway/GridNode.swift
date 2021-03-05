@@ -11,7 +11,7 @@ import UIKit
 class GridNode: SCNNode {
   let columns: Int
   let rows: Int
-  let planeNode = SCNNode()
+  let boardNode = SCNNode()
 
   var gridlineColor = UIColor.white
   var gridlineRadius = 0.05
@@ -39,17 +39,51 @@ class GridNode: SCNNode {
     self.left = 0
     super.init()
 
-    addChildNode(planeNode)
+    addChildNode(boardNode)
 
     _drawGrid()
   }
 
   // MARK: POSITIONERS
 
+  func placeAtGridPointIfClear(_ node: SCNNode, column: Int, row: Int) -> Bool {
+    
+    clearHitTestObjects()
+    
+    let sizeLocal = measure(node)
+    let sizeToBoard = rounded(measureToNodeSpace(node, to: boardNode))
+
+    let startPosition = _positionForGridPoint(column, row, andHeight: 0.5)
+    
+    let endCol = column + Int(sizeToBoard.x) - 1 // -1 to discount start column
+    let endRow = row + Int(sizeToBoard.z) - 1 // -1 to discount start row
+    let endPosition = _positionForGridPoint(endCol, endRow, andHeight: 0.5)
+
+    addHitTestObject(startPosition, withColor: UIColor.yellow)
+    addHitTestObject(endPosition, withColor: UIColor.green)
+    
+    let hitNodes = boardNode.hitTestWithSegment(from: startPosition, to: endPosition, options: nil)
+    print("[M@] ----------------")
+    print("[M@] sizeLocal         [\(sizeLocal)]")
+    print("[M@] sizeToBoard       [\(sizeToBoard)]")
+    print("[M@] start coord       [\(startPosition.x), \(startPosition.z)]")
+    print("[M@] end coord         [\(endPosition.x), \(endPosition.z)]")
+    print("[M@] [\(hitNodes)]")
+    print("[M@] placeAtGridPointIfClear [\(column), \(row)]")
+  
+    // SUCCESS
+    if hitNodes.isEmpty {
+      boardNode.addChildNode(node)
+      node.position = startPosition
+    }
+    
+    return hitNodes.isEmpty
+  }
+
   func moveToGridPoint(_ node: SCNNode, column: Int, row: Int) {
-    let newToGrid = node.parent != planeNode
+    let newToGrid = node.parent != boardNode
     if newToGrid {
-      planeNode.addChildNode(node)
+      boardNode.addChildNode(node)
     }
 
     let newPosition = _positionForGridPoint(column, row)
@@ -65,9 +99,7 @@ class GridNode: SCNNode {
       node.removeAllActions()
 
       let duration = 0.6
-      
-      let spinAngle:CGFloat = flipIsHeads() ? 90.0 : -90.0
-      
+      let spinAngle: CGFloat = flipIsHeads() ? 90.0 : -90.0
       let spinAction = SCNAction.rotateBy(x: 0.0, y: toRadians(angle: spinAngle), z: 0, duration: duration)
       spinAction.timingMode = .easeInEaseOut
       node.runAction(spinAction)
@@ -78,12 +110,43 @@ class GridNode: SCNNode {
         node.removeAllActions()
       })
     }
+
+    logGridMap()
+  }
+
+  func clearHitTestObjects() {
+    boardNode.enumerateChildNodes { node, _ in
+      if node.name == "HIT-TEST-OBJECT" {
+        node.removeFromParentNode()
+      }
+    }
+  }
+
+  func addHitTestObject(_ position: SCNVector3, withColor: UIColor) {
+    print("[M@] test obj at [\(position)]")
+    let boxGeometry = SCNBox(width: 0.2, height: 0.2, length: 0.2, chamferRadius: 0.2)
+    boxGeometry.firstMaterial?.diffuse.contents = withColor
+//    boxGeometry.firstMaterial?.transparency = 0.4
+    let node = SCNNode(geometry: boxGeometry)
+    node.name = "HIT-TEST-OBJECT"
+    node.position = position
+    boardNode.addChildNode(node)
+  }
+
+  func logGridMap() {
+    // what is in 6,3
+//    let positionLow = SCNVector3(6, 0, -3)
+//    let positionHigh = SCNVector3(6, 1, -3)
+//
+//    let hitNodes = boardNode.hitTestWithSegment(from: positionLow, to: positionHigh, options: nil)
+
+//    print("[M@] [\(hitNodes)]")
   }
 
   // MARK: GRID WORKERS
 
   func _drawGrid() {
-    planeNode.position = SCNVector3(-Float(columns / 2), Float(0.05), -Float(rows / 2))
+    boardNode.position = SCNVector3(-Float(columns / 2), Float(0.05), -Float(rows / 2))
     _drawGridCells()
     _numberCells()
   }
@@ -96,7 +159,7 @@ class GridNode: SCNNode {
         cellNode.position = _positionForGridPoint(c, r)
         cellNode.geometry?.firstMaterial?.diffuse.contents = UIColor.darkGray
         cellNode.rotation = SCNVector4Make(1, 0, 0, .pi / 2 * 3)
-        planeNode.addChildNode(cellNode)
+        boardNode.addChildNode(cellNode)
       }
     }
   }
@@ -112,7 +175,7 @@ class GridNode: SCNNode {
         node.position = _positionForGridPoint(c, r, andHeight: 0.1)
         node.rotation = SCNVector4Make(1, 0, 0, .pi / 2 * 3)
 
-        planeNode.addChildNode(node)
+        boardNode.addChildNode(node)
       }
     }
   }

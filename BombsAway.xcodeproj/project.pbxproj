@@ -15,6 +15,8 @@
 		6C60EB2725EBEFBF00A9157D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6C60EB2525EBEFBF00A9157D /* Main.storyboard */; };
 		6C60EB2925EBEFC200A9157D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C60EB2825EBEFC200A9157D /* Assets.xcassets */; };
 		6C60EB3825EC16A200A9157D /* GS+Creators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C60EB3725EC16A200A9157D /* GS+Creators.swift */; };
+		6C61989C25F1B275008F2794 /* AppUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C61989B25F1B275008F2794 /* AppUtils.swift */; };
+		6C849DBA25F06C1000232846 /* SceneKitUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C849DB925F06C1000232846 /* SceneKitUtils.swift */; };
 		6CD84D6D25EC2B2E00F2F412 /* GridNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD84D6C25EC2B2E00F2F412 /* GridNode.swift */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +31,8 @@
 		6C60EB2825EBEFC200A9157D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6C60EB2A25EBEFC200A9157D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6C60EB3725EC16A200A9157D /* GS+Creators.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = "GS+Creators.swift"; sourceTree = "<group>"; };
+		6C61989B25F1B275008F2794 /* AppUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUtils.swift; sourceTree = "<group>"; };
+		6C849DB925F06C1000232846 /* SceneKitUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneKitUtils.swift; sourceTree = "<group>"; };
 		6CD84D6C25EC2B2E00F2F412 /* GridNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -46,7 +50,9 @@
 		6C5CC67A25EDD07900BEEC7C /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				6C849DB925F06C1000232846 /* SceneKitUtils.swift */,
 				6C5CC67B25EDD09500BEEC7C /* MUtils.swift */,
+				6C61989B25F1B275008F2794 /* AppUtils.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -183,9 +189,11 @@
 				6C60EB3825EC16A200A9157D /* GS+Creators.swift in Sources */,
 				6CD84D6D25EC2B2E00F2F412 /* GridNode.swift in Sources */,
 				6C60EB2425EBEFBF00A9157D /* GameViewController.swift in Sources */,
+				6C61989C25F1B275008F2794 /* AppUtils.swift in Sources */,
 				6C5CC67C25EDD0D100BEEC7C /* MUtils.swift in Sources */,
 				6C60EB2025EBEFBF00A9157D /* AppDelegate.swift in Sources */,
 				6C5CC68025EDD5F000BEEC7C /* GridCell.swift in Sources */,
+				6C849DBA25F06C1000232846 /* SceneKitUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -36,6 +36,8 @@ class GameViewController: UIViewController {
     
   @objc
   func handleTap(_ gestureRecognize: UIGestureRecognizer) {
+    autoPositionShips()
+    
     // retrieve the SCNView
     let scnView = self.view as! SCNView
     
