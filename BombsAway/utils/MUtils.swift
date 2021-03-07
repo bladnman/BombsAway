@@ -43,3 +43,9 @@ func toDegrees(radians: Float) -> Float {
 func toDegrees(radians: CGFloat) -> CGFloat {
   return radians * CGFloat(radiansPerDegrees)
 }
+func rangeFrom(_ oneNumber: Int, _ anotherNumber: Int) -> CountableClosedRange<Int> {
+  if oneNumber > anotherNumber {
+    return anotherNumber...oneNumber
+  }
+  return oneNumber...anotherNumber
+}

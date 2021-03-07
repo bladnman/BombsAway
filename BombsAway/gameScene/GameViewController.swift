@@ -14,7 +14,7 @@ class GameViewController: UIViewController {
   
   var scene: SCNScene!
   var sceneView: SCNView!
-  var gridNode: GridNode!
+  var gridNode: Board!
   var playerNode: SCNNode!
   
   override func viewDidLoad() {
@@ -31,12 +31,12 @@ class GameViewController: UIViewController {
   }
   
   func movePlayer(_ column: Int, _ row: Int) {
-    gridNode.moveToGridPoint(playerNode, column: column, row: row)
+    gridNode.moveToGridPoint(playerNode, GridPoint(column, row))
   }
     
   @objc
   func handleTap(_ gestureRecognize: UIGestureRecognizer) {
-    autoPositionShips()
+    autoPositionSingleShip()
     
     // retrieve the SCNView
     let scnView = self.view as! SCNView
@@ -53,8 +53,12 @@ class GameViewController: UIViewController {
       
       let resultNode = result.node
       
-      if let resultNode = resultNode as? GridCell {
+      if let resultNode = resultNode as? BoardCell {
         movePlayer(resultNode.column, resultNode.row)
+      }
+      
+      if resultNode.name == "floor" {
+        removeAllShips()
       }
             
       // get its material
