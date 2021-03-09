@@ -62,14 +62,15 @@ func makeText(text: String, depthOfText: CGFloat, color: UIColor, transparency: 
 func createOriginIndicator(_ node: SCNNode, color: UIColor = UIColor.green) {
   let originNode = SCNNode(geometry: SCNBox(width: 0.1, height: 5.0, length: 0.1, chamferRadius: 0.3))
   originNode.geometry?.firstMaterial?.diffuse.contents = color
-  originNode.name = "ORIGIN"
+  originNode.name = C_OBJ_NAME.origin
   originNode.position = SCNVector3(0, 0, 0)
   node.addChildNode(originNode)
 }
 func createPivotIndicator(_ node: SCNNode, color: UIColor = UIColor.green) {
   let originNode = SCNNode(geometry: SCNCone(topRadius: 0.0, bottomRadius: 0.2, height: 0.5))
   originNode.geometry?.firstMaterial?.diffuse.contents = color
-  originNode.name = "ORIGIN"
+  originNode.geometry?.firstMaterial?.transparency = 0.3
+  originNode.name = C_OBJ_NAME.pivot
 
   let transform = node.pivot
   originNode.position = SCNVector3(transform.m41, transform.m42, transform.m43)

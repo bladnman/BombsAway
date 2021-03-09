@@ -14,21 +14,12 @@ extension GameViewController {
   func createNewScene() {
     createSceneObjects()
     createFloor()
-    createGrid()
+    createBoard()
     createCamera()
     createLights()
-    createPlayer()
+//    createPlayer()
     
     createOriginIndicator(scene.rootNode)
-    
-    // DELAY THE KICK-OFF
-    // hit tests are not happy without this
-    let wait = SCNAction.wait(duration: 0.1)
-    let run = SCNAction.run { _ in
-        self.createTestShips()
-    }
-    let seq = SCNAction.sequence([wait, run])
-    scene.rootNode.runAction(seq)
   }
   func resetGame() {
     scene.rootNode.enumerateChildNodes { node, _ in
@@ -61,28 +52,20 @@ extension GameViewController {
   }
   func createFloor() {
     let floor = SCNFloor()
-    floor.firstMaterial?.diffuse.contents = UIImage(named: "art.scnassets/grass.png")
-    floor.firstMaterial?.diffuse.wrapS = .repeat
-    floor.firstMaterial?.diffuse.wrapT = .repeat
-    floor.firstMaterial?.diffuse.contentsTransform = SCNMatrix4MakeScale(12.5, 12.5, 12.5)
-    floor.reflectivity = 0.4
-    
-    // MAKE IT AN OCEAN INSTEAD
-    floor.firstMaterial?.emission.contents = UIColor.blue
-    
+    floor.firstMaterial?.diffuse.contents = UIColor.fromHex("#2c3e50")
+    floor.reflectivity = 0.0
     let floorNode = SCNNode(geometry: floor)
-    floorNode.name = "floor"
+    floorNode.name = C_OBJ_NAME.worldFloor
     scene.rootNode.addChildNode(floorNode)
   }
   func createCamera() {
-    // create and add a camera to the scene
     let cameraNode = SCNNode()
     cameraNode.camera = SCNCamera()
     scene.rootNode.addChildNode(cameraNode)
     
     // place the camera
-    cameraNode.position = SCNVector3(x: 1, y: 8, z: -3)
-    cameraNode.eulerAngles = SCNVector3(x: -toRadians(angle: 60), y: 0, z: 0)
+    cameraNode.position = SCNVector3(x: 1, y: 9, z: -6)
+    cameraNode.eulerAngles = SCNVector3(x: -toRadians(angle: 70), y: 0, z: 0)
   }
   func createLights() {
     // create and add a light to the scene
@@ -99,10 +82,14 @@ extension GameViewController {
     ambientLightNode.light!.color = UIColor.darkGray
     scene.rootNode.addChildNode(ambientLightNode)
   }
-  func createGrid() {
-    gridNode = Board(sceneView: sceneView, columns: 10, rows: 10)
-    scene.rootNode.addChildNode(gridNode)
-    gridNode.position = SCNVector3(0, 0, -10)
+  func createBoard() {
+    if let boardNode = self.boardNode {
+      boardNode.removeAllActions()
+      boardNode.removeFromParentNode()
+    }
+    boardNode = Board(sceneView: sceneView, columns: 10, rows: 10)
+    scene.rootNode.addChildNode(boardNode)
+    boardNode.position = SCNVector3(0, 0, -10)
   }
   func createPlayer() {
     let boxGeometry = SCNBox(width: 0.7, height: 0.1, length: 0.7, chamferRadius: 0.04)
@@ -112,75 +99,10 @@ extension GameViewController {
     let node = SCNNode(geometry: boxGeometry)
     playerNode = node
     
-    gridNode.moveToGridPoint(playerNode, GridPoint(7, 2))
-  }
-  func createTestShips() {
-    
-    // KNOWN LARGE HORIZONTAL SHIP
-//    gridNode.moveToGridPoint(makeShip(10, UIColor.white), GridPoint(5, 5))
-    
-//    let ship0 = makeShip(2)
-//    gridNode.placeAtGridPointIfClear(ship0, GridPoint(3, 3))
-//
-//    let ship90 = makeShip(2)
-//    ship90.eulerAngles = SCNVector3Make(0.0, toRadians(angle: Float(90)), 0.0)
-//    gridNode.placeAtGridPointIfClear(ship90, GridPoint(8, 3))
-//
-//    let ship180 = makeShip(2)
-//    ship180.eulerAngles = SCNVector3Make(0.0, toRadians(angle: Float(180)), 0.0)
-//    gridNode.placeAtGridPointIfClear(ship180, GridPoint(3, 8))
-//
-//    let ship270 = makeShip(2)
-//    ship270.eulerAngles = SCNVector3Make(0.0, toRadians(angle: Float(270)), 0.0)
-//    gridNode.placeAtGridPointIfClear(ship270, GridPoint(8, 8))
-    
-    
-    
-    autoPositionShips()
-    
-  }
-  func autoPositionShips() {
-    for _ in 0...6 {
-      autoPositionSingleShip()
-    }
-  }
-  func autoPositionSingleShip() {
-    autoPositionShipWithLength(roll(4) + 1)
-  }
-  func autoPositionShipWithLength(_ length: Int) {
-    if length > 5 || length < 2 {
-      print("[M@] invalid length")
-      return
-    }
-    let node = makeShip(length)
-    var success = false
-    let rotations = getRotationArray()
-    let column = roll(10)
-    let row = roll(10)
-    
-//    let rotations = [Float(180.0)]
-//    let column = 9
-//    let row = 9
-    
-    print("[M@] ===============================")
-    print("[M@] POSITION [\(column), \(row)] : LENGTH [\(length)]")
-    for angle in rotations {
-      print("[M@] ATTEMPTING ANGLE: [\(angle)]")
-      node.eulerAngles = SCNVector3Make(0.0, toRadians(angle: Float(angle)), 0.0)
-      if gridNode.placeAtGridPointIfClear(node, GridPoint(column, row)) {
-        print("[M@] S U C C E S S   ANGLE: [\(angle)]")
-        success = true
-        break
-      }
-    }
-    // DID NOT PLACE
-    if success == false {
-      print("[M@] no place for this... QUITTING")
-    }
-    print("[M@] ===============================")
+    boardNode.moveToGridPoint(playerNode, GridPoint(7, 2))
   }
   func removeAllShips() {
-    gridNode.removeAllShips()
+    createBoard()
   }
 }
 

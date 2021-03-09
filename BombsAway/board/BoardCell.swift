@@ -11,12 +11,55 @@ class BoardCell: SCNNode {
   let column: Int
   let row: Int
   
-  var _label: SCNNode?
-  var shipRef: SCNNode?
   
-  var isLabelVisible: Bool = true {
+  var mode = C_CELL_MODE.none {
+    didSet {
+      updateFloor()
+    }
+  }
+  var _label: SCNNode?
+  var floorNode: SCNNode!
+  var shipRef: SCNNode?
+  var isSpawnPoint = false {
+    didSet {
+      if isSpawnPoint {
+        isSpawnRegion = true
+      }
+    }
+  }
+  var isSpawnRegion = false {
+    didSet {
+      updateFloor()
+    }
+  }
+  
+  var isLabelVisible: Bool = false {
     didSet {
       updateLabel()
+    }
+  }
+  var isHighlighted: Bool = false {
+    didSet {
+      updateFloor()
+    }
+  }
+  var floorColor: UIColor {
+    get {
+      switch mode {
+      case .highlight:
+        return UIColor.fromHex("#778ca3")
+      case .move:
+        return UIColor.fromHex("#778ca3")
+      default:
+        break
+      }
+      if isHighlighted {
+        return UIColor.fromHex("#778ca3")
+      }
+      if isSpawnRegion {
+        return UIColor.fromHex("#303952")
+      }
+      return UIColor.fromHex("#34495e")
     }
   }
   
@@ -34,14 +77,19 @@ class BoardCell: SCNNode {
     fatalError("init(coder:) has not been implemented")
   }
   func createFloor() {
-    let floor = SCNPlane(width: 1.0, height: 1.0)
-    floor.firstMaterial?.diffuse.contents = UIColor.darkGray
-    
-    let floorNode = SCNNode(geometry: floor)
-    floorNode.name = "FLOOR"
-    _faceUp(floorNode)
+    let geom = SCNBox(width: 1.0, height: 0.07, length: 1.0, chamferRadius: 0.02)
+//    let geom = SCNBox(width: 0.98, height: 0.07, length: 0.98, chamferRadius: 0.0)
+
+    floorNode = SCNNode(geometry: geom)
+    floorNode?.geometry?.firstMaterial?.diffuse.contents = floorColor
+    floorNode.name = C_OBJ_NAME.cellFloor
+    floorNode.rotation = SCNVector4Make(1, 0, 0, .pi / 2 * 2)
     floorNode.position = SCNVector3(0,0,0)
+    
     addChildNode(floorNode)
+  }
+  func updateFloor() {
+    floorNode?.geometry?.firstMaterial?.diffuse.contents = floorColor
   }
   
   
@@ -52,10 +100,10 @@ class BoardCell: SCNNode {
       if _label == nil {
         _label = makeText(text: "\(column),\(row)",
                           depthOfText: 3.0,
-                          color: UIColor.orange,
+                          color: UIColor.fromHex("#95a5a6"),
                           transparency: 1.0)
         _label!.position = SCNVector3(0.0, 0.1, 0.0)
-        _label!.name = "LABEL"
+        _label!.name = C_OBJ_NAME.label
         _faceUp(_label!)
         addChildNode(_label!)
       }
@@ -63,9 +111,8 @@ class BoardCell: SCNNode {
     
     // HIDE
     else {
-      if let label = _label {
-        label.removeFromParentNode()
-      }
+      self._label?.removeFromParentNode()
+      self._label = nil
     }
   }
   func _faceUp(_ node: SCNNode) {
