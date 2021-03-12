@@ -20,18 +20,6 @@ func getRotationArray() -> [Float] {
   let arr = [Float(0.0), Float(90.0), Float(180.0), Float(270.0)]
   return arr.shuffled()
 }
-
-func makeShip(_ width: Int, _ color: UIColor = randomShipColor()) -> SCNNode {
-  let boxGeometry = SCNBox(width: CGFloat(width), height: 1.0, length: 1.0, chamferRadius: 0.04)
-  boxGeometry.firstMaterial?.diffuse.contents = color
-//  boxGeometry.firstMaterial?.transparency = 0.7
-  let node = SCNNode(geometry: boxGeometry)
-  node.name = C_OBJ_NAME.ship
-
-  // PIVOT POINT:  left, bottom, 1/2 length
-  node.pivot = SCNMatrix4MakeTranslation(-0.5 * Float(width), -0.5, 0.0)
-  return node
-}
 func randomShipColor() -> UIColor {
   return UIColor.fromHex(shipColors.randomElement()!)
 }

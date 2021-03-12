@@ -14,7 +14,7 @@ class GameViewController: UIViewController {
   var scene: SCNScene!
   var sceneView: SCNView!
   var boardNode: Board!
-  var playerNode: SCNNode!
+  var player: SCNNode!
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -40,21 +40,28 @@ class GameViewController: UIViewController {
     
     // check what nodes are tapped
     let p = gestureRecognize.location(in: scnView)
-    let hitResults = scnView.hitTest(p, options: [:])
     
-//    let boardCell = hitResults.first(where: { $0.node is BoardCell })?.node
-//    print("[M@] [\(hitResults)]")
-//    print("[M@] [\(boardCell)]")
+    let options : [SCNHitTestOption: Any] = [SCNHitTestOption.backFaceCulling: true,
+                                           SCNHitTestOption.searchMode: 1,
+                                           SCNHitTestOption.ignoreChildNodes : false,
+                                           SCNHitTestOption.ignoreHiddenNodes : false]
+    let hitResults = scnView.hitTest(p, options: options)
+    
     // check that we clicked on at least one object
     if hitResults.count > 0 {
       // retrieved the first clicked object
       let result = hitResults[0]
       
       let resultNode = result.node
-      if let boardCell = resultNode.parent as? BoardCell {
-        if boardCell.mode == .move {
-          movePlayer(boardCell.column, boardCell.row)
+      if let boardCellFloor = hitResults.first(where: { $0.node.name == C_OBJ_NAME.cellFloor })?.node {
+        if let boardCell = boardCellFloor.parent as? BoardCell {
+          if boardCell.mode == .move {
+            movePlayer(boardCell.column, boardCell.row)
+          }
         }
+      }
+      if let ship = hitResults.first(where: { $0.node.name == C_OBJ_NAME.ship })?.node {
+        print("[M@] [\(ship)]")
       }
       
       if resultNode.name == C_OBJ_NAME.worldFloor {

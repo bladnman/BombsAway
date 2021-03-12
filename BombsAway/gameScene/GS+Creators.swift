@@ -17,8 +17,6 @@ extension GameViewController {
     createBoard()
     createCamera()
     createLights()
-//    createPlayer()
-    
     createOriginIndicator(scene.rootNode)
   }
   func resetGame() {
@@ -87,19 +85,9 @@ extension GameViewController {
       boardNode.removeAllActions()
       boardNode.removeFromParentNode()
     }
-    boardNode = Board(sceneView: sceneView, columns: 10, rows: 10)
+    boardNode = Board(sceneView: sceneView, columns: 10, rows: 10, isOwn: false)
     scene.rootNode.addChildNode(boardNode)
     boardNode.position = SCNVector3(0, 0, -10)
-  }
-  func createPlayer() {
-    let boxGeometry = SCNBox(width: 0.7, height: 0.1, length: 0.7, chamferRadius: 0.04)
-    boxGeometry.firstMaterial?.diffuse.contents = UIColor.white
-    boxGeometry.firstMaterial?.transparency = 0.8
-    boxGeometry.firstMaterial?.emission.intensity = 0.8
-    let node = SCNNode(geometry: boxGeometry)
-    playerNode = node
-    
-    boardNode.moveToGridPoint(playerNode, GridPoint(7, 2))
   }
   func removeAllShips() {
     createBoard()

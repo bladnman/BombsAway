@@ -66,14 +66,20 @@ func createOriginIndicator(_ node: SCNNode, color: UIColor = UIColor.green) {
   originNode.position = SCNVector3(0, 0, 0)
   node.addChildNode(originNode)
 }
-func createPivotIndicator(_ node: SCNNode, color: UIColor = UIColor.green) {
-  let originNode = SCNNode(geometry: SCNCone(topRadius: 0.0, bottomRadius: 0.2, height: 0.5))
-  originNode.geometry?.firstMaterial?.diffuse.contents = color
-  originNode.geometry?.firstMaterial?.transparency = 0.3
-  originNode.name = C_OBJ_NAME.pivot
+@discardableResult
+func createPivotIndicator(_ node: SCNNode, color: UIColor = UIColor.green) -> SCNNode {
+  let height = 0.3
+  let pivotNode = SCNNode(geometry: SCNCone(topRadius: 0.0, bottomRadius: 0.1, height: CGFloat(height)))
+  pivotNode.geometry?.firstMaterial?.diffuse.contents = color
+  pivotNode.geometry?.firstMaterial?.transparency = 0.3
+  
+  pivotNode.pivot = SCNMatrix4MakeTranslation(0.0, -1 * Float(height / 2), 0.0)
+
+  pivotNode.name = C_OBJ_NAME.pivot
 
   let transform = node.pivot
-  originNode.position = SCNVector3(transform.m41, transform.m42, transform.m43)
+  pivotNode.position = SCNVector3(transform.m41, transform.m42, transform.m43)
   
-  node.addChildNode(originNode)
+  node.addChildNode(pivotNode)
+  return node
 }

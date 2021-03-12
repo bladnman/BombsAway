@@ -43,6 +43,18 @@ struct GridPoint {
       return GridPoint(0, 0)
     }
   }
+  
+  func isDiagonalTo(_ gp: GridPoint) -> Bool {
+    return (self.column - gp.column == self.row - gp.row) ||
+      (self.column - gp.column == -1 * (self.row - gp.row))
+  }
+  func isStraightTo(_ gp: GridPoint) -> Bool {
+    return self.column == gp.column || self.row == gp.row
+  }
+  
+  func toString() -> String {
+    return "\(column), \(row)"
+  }
 }
 extension GridPoint {
   static func +(gp1: GridPoint, gp2: GridPoint) -> GridPoint {
@@ -56,5 +68,15 @@ extension GridPoint {
       gp1.column - gp2.column,
       gp1.row - gp2.row
     )
+  }
+  static func ==(gp1: GridPoint, gp2: GridPoint) -> Bool {
+    return
+      gp1.column == gp2.column &&
+      gp1.row == gp2.row
+  }
+  static func !=(gp1: GridPoint, gp2: GridPoint) -> Bool {
+    return
+      gp1.column != gp2.column ||
+      gp1.row != gp2.row
   }
 }

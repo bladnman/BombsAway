@@ -12,6 +12,8 @@
 		6C16970A25F5971300596637 /* Board+tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C16970925F5971300596637 /* Board+tests.swift */; };
 		6C16970E25F5974A00596637 /* Board+structs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C16970D25F5974A00596637 /* Board+structs.swift */; };
 		6C16971225F59C2600596637 /* Board+positioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C16971125F59C2600596637 /* Board+positioning.swift */; };
+		6C39ED6E25F9A1CB005BF5C2 /* SCNNode+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C39ED6D25F9A1CB005BF5C2 /* SCNNode+ext.swift */; };
+		6C43149A25F8F8B900092D54 /* ShipNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C43149925F8F8B900092D54 /* ShipNode.swift */; };
 		6C5CC67C25EDD0D100BEEC7C /* MUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5CC67B25EDD09500BEEC7C /* MUtils.swift */; };
 		6C5CC68025EDD5F000BEEC7C /* BoardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5CC67F25EDD5F000BEEC7C /* BoardCell.swift */; };
 		6C60EB2025EBEFBF00A9157D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C60EB1F25EBEFBF00A9157D /* AppDelegate.swift */; };
@@ -34,6 +36,8 @@
 		6C16970925F5971300596637 /* Board+tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Board+tests.swift"; sourceTree = "<group>"; };
 		6C16970D25F5974A00596637 /* Board+structs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Board+structs.swift"; sourceTree = "<group>"; };
 		6C16971125F59C2600596637 /* Board+positioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Board+positioning.swift"; sourceTree = "<group>"; };
+		6C39ED6D25F9A1CB005BF5C2 /* SCNNode+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNNode+ext.swift"; sourceTree = "<group>"; };
+		6C43149925F8F8B900092D54 /* ShipNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipNode.swift; sourceTree = "<group>"; };
 		6C5CC67B25EDD09500BEEC7C /* MUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MUtils.swift; sourceTree = "<group>"; };
 		6C5CC67F25EDD5F000BEEC7C /* BoardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardCell.swift; sourceTree = "<group>"; };
 		6C60EB1C25EBEFBF00A9157D /* BombsAway.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BombsAway.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,6 +67,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6C43149825F8F89D00092D54 /* ship */ = {
+			isa = PBXGroup;
+			children = (
+				6C43149925F8F8B900092D54 /* ShipNode.swift */,
+			);
+			path = ship;
+			sourceTree = "<group>";
+		};
+		6C43149D25F8FF7E00092D54 /* objects */ = {
+			isa = PBXGroup;
+			children = (
+				6C6198A225F1C009008F2794 /* board */,
+				6C8364F325F70ED500A6E4AD /* player */,
+				6C43149825F8F89D00092D54 /* ship */,
+			);
+			path = objects;
+			sourceTree = "<group>";
+		};
 		6C5CC67A25EDD07900BEEC7C /* utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -95,17 +117,16 @@
 		6C60EB1E25EBEFBF00A9157D /* BombsAway */ = {
 			isa = PBXGroup;
 			children = (
-				6C8364F325F70ED500A6E4AD /* player */,
+				6C60EB2125EBEFBF00A9157D /* art.scnassets */,
+				6C60EB2825EBEFC200A9157D /* Assets.xcassets */,
+				6C43149D25F8FF7E00092D54 /* objects */,
 				6C5CC67A25EDD07900BEEC7C /* utils */,
 				6CD84D7425EC66CC00F2F412 /* shaders */,
 				6CD84D6F25EC657B00F2F412 /* extensions */,
 				6C60EB3625EC166C00A9157D /* gameScene */,
 				6C60EB1F25EBEFBF00A9157D /* AppDelegate.swift */,
-				6C60EB2125EBEFBF00A9157D /* art.scnassets */,
 				6C60EB2525EBEFBF00A9157D /* Main.storyboard */,
-				6C60EB2825EBEFC200A9157D /* Assets.xcassets */,
 				6C60EB2A25EBEFC200A9157D /* Info.plist */,
-				6C6198A225F1C009008F2794 /* board */,
 			);
 			path = BombsAway;
 			sourceTree = "<group>";
@@ -145,6 +166,7 @@
 			isa = PBXGroup;
 			children = (
 				6C1696D225F2FC3900596637 /* UIColor+ext.swift */,
+				6C39ED6D25F9A1CB005BF5C2 /* SCNNode+ext.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -234,12 +256,14 @@
 				6C8364F025F6F00200A6E4AD /* Constants.swift in Sources */,
 				6C5CC67C25EDD0D100BEEC7C /* MUtils.swift in Sources */,
 				6C16970E25F5974A00596637 /* Board+structs.swift in Sources */,
+				6C39ED6E25F9A1CB005BF5C2 /* SCNNode+ext.swift in Sources */,
 				6C16970A25F5971300596637 /* Board+tests.swift in Sources */,
 				6C16971225F59C2600596637 /* Board+positioning.swift in Sources */,
 				6C60EB2025EBEFBF00A9157D /* AppDelegate.swift in Sources */,
 				6C16970325F5678A00596637 /* Board+helpers.swift in Sources */,
 				6C5CC68025EDD5F000BEEC7C /* BoardCell.swift in Sources */,
 				6C849DBA25F06C1000232846 /* SceneKitUtils.swift in Sources */,
+				6C43149A25F8F8B900092D54 /* ShipNode.swift in Sources */,
 				6C8364F525F70EEE00A6E4AD /* PlayerNode.swift in Sources */,
 				6C1696D325F2FC3900596637 /* UIColor+ext.swift in Sources */,
 			);

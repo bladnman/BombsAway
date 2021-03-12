@@ -27,9 +27,11 @@ struct Constants {
       static let ship = "ship"
       static let worldFloor = "worldFloor"
       static let cellFloor = "cellFloor"
+      static let boardCell = "boardCell"
       static let label = "label"
       static let origin = "origin"
       static let pivot = "pivot"
+      static let hitcoin = "hitcoin"
     }
   }
   struct Cell {
