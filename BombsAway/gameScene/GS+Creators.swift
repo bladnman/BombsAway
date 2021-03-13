@@ -14,9 +14,9 @@ extension GameViewController {
   func createNewScene() {
     createSceneObjects()
     createFloor()
-    createBoard()
     createCamera()
     createLights()
+    createBoard()
     createOriginIndicator(scene.rootNode)
   }
   func resetGame() {
@@ -30,7 +30,8 @@ extension GameViewController {
   func createSceneObjects() {
     sceneView = (view as! SCNView)
     sceneView.delegate = self
-    scene = SCNScene()
+//    scene = SCNScene()
+    scene = SCNScene(named: "art.scnassets/main-scene.scn")
 //    scene.physicsWorld.contactDelegate = self
     sceneView.present(scene, with: .fade(withDuration: 0.5), incomingPointOfView: nil, completionHandler: nil)
     
@@ -57,13 +58,14 @@ extension GameViewController {
     scene.rootNode.addChildNode(floorNode)
   }
   func createCamera() {
-    let cameraNode = SCNNode()
-    cameraNode.camera = SCNCamera()
-    scene.rootNode.addChildNode(cameraNode)
+    camera = SCNNode()
+    camera.camera = SCNCamera()
+    scene.rootNode.addChildNode(camera)
     
     // place the camera
-    cameraNode.position = SCNVector3(x: 1, y: 9, z: -6)
-    cameraNode.eulerAngles = SCNVector3(x: -toRadians(angle: 70), y: 0, z: 0)
+    camera.position = SCNVector3(x: 1, y: 9, z: -6)
+    camera.eulerAngles = SCNVector3(x: -toRadians(angle: 70), y: 0, z: 0)
+    
   }
   func createLights() {
     // create and add a light to the scene
@@ -81,13 +83,30 @@ extension GameViewController {
     scene.rootNode.addChildNode(ambientLightNode)
   }
   func createBoard() {
-    if let boardNode = self.boardNode {
-      boardNode.removeAllActions()
-      boardNode.removeFromParentNode()
+    if let oldBoard = self.attackBoard {
+      oldBoard.removeAllActions()
+      oldBoard.removeFromParentNode()
     }
-    boardNode = Board(sceneView: sceneView, columns: 10, rows: 10, isOwn: false)
-    scene.rootNode.addChildNode(boardNode)
-    boardNode.position = SCNVector3(0, 0, -10)
+    if let oldBoard = self.defendBoard {
+      oldBoard.removeAllActions()
+      oldBoard.removeFromParentNode()
+    }
+
+    // ATTACK BOARD
+    attackBoard = Board(sceneView: sceneView, columns: 10, rows: 10, isOwn: false)
+    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "backBoardNode" }) {
+      attackBoard.position = SCNVector3(-0.5, 0, -0.5)
+      attackBoard.name = C_OBJ_NAME.attackBoard
+      holderNode.addChildNode(attackBoard)
+    }
+    
+    // DEFEND BOARD
+    defendBoard = Board(sceneView: sceneView, columns: 10, rows: 10, isOwn: true)
+    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "bottomBoardNode" }) {
+      defendBoard.position = SCNVector3(-0.5, 0, -0.5)
+      defendBoard.name = C_OBJ_NAME.defendBoard
+      holderNode.addChildNode(defendBoard)
+    }
   }
   func removeAllShips() {
     createBoard()
@@ -96,7 +115,6 @@ extension GameViewController {
 
 extension GameViewController: SCNSceneRendererDelegate {
   func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-//    updatePositions()
-//    updateTraffic()
+    // noop
   }
 }

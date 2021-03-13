@@ -70,10 +70,9 @@ extension Board {
     ship.runAction(seqAction)
     
     // add ship to board
-//    boardGeom.addChildNode(ship)
-    
-    if !isOwn {
-      ship.geometry?.firstMaterial?.transparency = 0.2
+    if isOwn {
+      ship.geometry?.firstMaterial?.transparency = 0.7
+      boardGeom.addChildNode(ship)
     }
     
     // UPDATE CELLS

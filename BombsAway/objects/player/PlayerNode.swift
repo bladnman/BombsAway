@@ -9,7 +9,7 @@ import SceneKit
 
 class PlayerNode: SCNNode {
   let NAME = C_OBJ_NAME.player
-  var stepSize: Int = 4
+  var stepSize: Int = 2
   var gridPoint: GridPoint {
     get {
       return GridPoint(Int(position.x), Int(position.z))

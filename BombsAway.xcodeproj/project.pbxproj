@@ -27,6 +27,7 @@
 		6C8364F025F6F00200A6E4AD /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C8364EF25F6F00200A6E4AD /* Constants.swift */; };
 		6C8364F525F70EEE00A6E4AD /* PlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C8364F425F70EEE00A6E4AD /* PlayerNode.swift */; };
 		6C849DBA25F06C1000232846 /* SceneKitUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C849DB925F06C1000232846 /* SceneKitUtils.swift */; };
+		6CC0C19125FC3FC30006464D /* GS+input.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CC0C19025FC3FC30006464D /* GS+input.swift */; };
 		6CD84D6D25EC2B2E00F2F412 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD84D6C25EC2B2E00F2F412 /* Board.swift */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		6C8364EF25F6F00200A6E4AD /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		6C8364F425F70EEE00A6E4AD /* PlayerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNode.swift; sourceTree = "<group>"; };
 		6C849DB925F06C1000232846 /* SceneKitUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneKitUtils.swift; sourceTree = "<group>"; };
+		6CC0C19025FC3FC30006464D /* GS+input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GS+input.swift"; sourceTree = "<group>"; };
 		6CD84D6C25EC2B2E00F2F412 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -136,6 +138,7 @@
 			children = (
 				6C60EB2325EBEFBF00A9157D /* GameViewController.swift */,
 				6C60EB3725EC16A200A9157D /* GS+Creators.swift */,
+				6CC0C19025FC3FC30006464D /* GS+input.swift */,
 			);
 			path = gameScene;
 			sourceTree = "<group>";
@@ -255,6 +258,7 @@
 				6C61989C25F1B275008F2794 /* AppUtils.swift in Sources */,
 				6C8364F025F6F00200A6E4AD /* Constants.swift in Sources */,
 				6C5CC67C25EDD0D100BEEC7C /* MUtils.swift in Sources */,
+				6CC0C19125FC3FC30006464D /* GS+input.swift in Sources */,
 				6C16970E25F5974A00596637 /* Board+structs.swift in Sources */,
 				6C39ED6E25F9A1CB005BF5C2 /* SCNNode+ext.swift in Sources */,
 				6C16970A25F5971300596637 /* Board+tests.swift in Sources */,

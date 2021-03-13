@@ -28,7 +28,7 @@ class BoardCell: SCNNode {
     case .highlight:
       return UIColor.fromHex("#778ca3")
     case .move:
-      return UIColor.fromHex("#778ca3")
+      return UIColor.fromHex("#3e4852")
     default:
       break
     }

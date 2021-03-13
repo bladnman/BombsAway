@@ -32,6 +32,8 @@ struct Constants {
       static let origin = "origin"
       static let pivot = "pivot"
       static let hitcoin = "hitcoin"
+      static let attackBoard = "attackBoard"
+      static let defendBoard = "defendBoard"
     }
   }
   struct Cell {

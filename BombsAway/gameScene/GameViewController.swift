@@ -13,26 +13,24 @@ import UIKit
 class GameViewController: UIViewController {
   var scene: SCNScene!
   var sceneView: SCNView!
-  var boardNode: Board!
+  var attackBoard: Board!
+  var defendBoard: Board!
   var player: SCNNode!
   
+  // CAMERA
+  var camera: SCNNode!
+  var lastWidthRatio: Float = 0
+  var lastHeightRatio: Float = 0
+
   override func viewDidLoad() {
     super.viewDidLoad()
-        
-    createNewScene()
+    initializeGame()
   }
 
   func initializeGame() {
     createNewScene()
-//    setupPlayer()
-//    setupCollisionNode()
-//    setupActions()
   }
   
-  func movePlayer(_ column: Int, _ row: Int) {
-    boardNode.movePlayerTo(GridPoint(column, row))
-  }
-    
   @objc
   func handleTap(_ gestureRecognize: UIGestureRecognizer) {
     // retrieve the SCNView
@@ -56,7 +54,9 @@ class GameViewController: UIViewController {
       if let boardCellFloor = hitResults.first(where: { $0.node.name == C_OBJ_NAME.cellFloor })?.node {
         if let boardCell = boardCellFloor.parent as? BoardCell {
           if boardCell.mode == .move {
-            movePlayer(boardCell.column, boardCell.row)
+            if let board = boardCell.parent?.parent as? Board {
+              board.movePlayerTo(boardCell.gridPoint)
+            }
           }
         }
       }
