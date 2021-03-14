@@ -55,7 +55,7 @@ class GameViewController: UIViewController {
         if let boardCell = boardCellFloor.parent as? BoardCell {
           if boardCell.mode == .move {
             if let board = boardCell.parent?.parent as? Board {
-              board.movePlayerTo(boardCell.gridPoint)
+              board.movePlayerShipTo(boardCell.gridPoint)
             }
           }
         }

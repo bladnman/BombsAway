@@ -7,7 +7,7 @@
 
 import SceneKit
 
-class ShipNode: SCNNode {
+class TargetShip: SCNNode {
   let NAME: String = C_OBJ_NAME.ship
   var direction: BoardDirection = BoardDirection.zero
   var boardSize: BoardSize = BoardSize.zero {
@@ -39,19 +39,27 @@ class ShipNode: SCNNode {
   func isSolidAt(_ gp: GridPoint) -> Bool {
     return hasCellAt(gp) && !isHitAt(gp)
   }
+  @discardableResult
   func hitAt(_ gp: GridPoint) -> Bool {
     guard hasCellAt(gp) else {
       return false
     }
     hits[gp.toString()] = true
+    updateCells()
     return true
   }
   func hasCellAt(_ gp: GridPoint) -> Bool {
-    guard boardCells != nil else {
-      return false
+    return cellAt(gp) != nil
+  }
+  func cellAt(_ gp: GridPoint) -> BoardCell? {
+    return boardCells == nil
+      ? nil
+      : boardCells!.first { $0.gridPoint == gp }
+  }
+  func updateCells() {
+    if let boardCells = boardCells {
+      boardCells.forEach { $0.update() }
     }
-    
-    return boardCells!.contains(where: { $0.gridPoint == gp })
   }
   
   

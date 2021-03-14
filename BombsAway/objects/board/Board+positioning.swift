@@ -36,7 +36,7 @@ extension Board {
       })
     }
   }
-  func positionShip(_ ship: ShipNode, _ startGP: GridPoint) {
+  func positionShip(_ ship: TargetShip, _ startGP: GridPoint) {
     let boardRange = BoardRange(startGP, ship.boardSize)
     let positionFrame = boxForRange(boardRange)
 
@@ -79,7 +79,7 @@ extension Board {
     let shipCells = cellListFor(BoardRange(startGP, ship.boardSize))
     shipCells.forEach { cell in
       cell.isLabelVisible = false
-      cell.shipRef = ship
+      cell.targetShipRef = ship
     }
     
     // add awareness of these grid points to the ship

@@ -12,8 +12,9 @@ extension SCNNode {
     removePivotIndicator()
     createPivotIndicator(self)
   }
+
   func removePivotIndicator() {
-    if let _pivotIndicator = self.childNodes.filter({ $0.name == C_OBJ_NAME.pivot}).first {
+    if let _pivotIndicator = childNodes.filter({ $0.name == C_OBJ_NAME.pivot }).first {
       _pivotIndicator.removeAllActions()
       _pivotIndicator.removeFromParentNode()
     }

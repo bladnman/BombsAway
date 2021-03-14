@@ -22,7 +22,7 @@ class Board: SCNNode {
   let sceneView: SCNView!
   var spawnGP: GridPoint!
   var spawnRect: BoardRect!
-  let player = PlayerNode()
+  let player = PlayerShip()
 
   let boardGeom = SCNNode()
   var placementStartNode = SCNNode()
@@ -70,63 +70,12 @@ class Board: SCNNode {
     // clear cells
     cellList.forEach { (_, cell) in
       cell.isLabelVisible = true
-      cell.shipRef = nil
+      cell.targetShipRef = nil
     }
-  }
-  func movePlayerTo(_ gp: GridPoint, force: Bool = false) {
-    guard force || isValidMove(gp) else {
-      return
-    }
-    
-    var finalGP = gp
-    
-    if !force {
-      // must find ships in the way
-      let diagonals = cellListForDiagonalsBetween(startGP: player.gridPoint, endGP: gp)
-      let straights = cellListForStraightsBetween(startGP: player.gridPoint, endGP: gp)
-      let cellSteps = diagonals + straights
-      
-      // no steps
-      if cellSteps.isEmpty {
-        return
-      }
-      
-      var finalCellStop = cellSteps.last
-      if let i = cellSteps.firstIndex(where: { $0.hasSolidShip }) {
-        
-        // YOU HIT A SHIP
-        let shipCell = cellSteps[i]
-        if let ship = shipCell.shipRef {
-          
-          if shipCell.shipRef?.hitAt(shipCell.gridPoint) ?? false {
-            print("[M@] we hit! \(shipCell.gridPoint)")
-            // update all the cells for this ship
-            ship.boardCells?.forEach{ cell in
-              cell.updateHitNode()
-            }
-          }
-          
-          if ship.isSunk {
-            print("[M@] DUDE! YOU SUNK MY BATTLESHIP!")
-          }
-        }
-        
-        finalCellStop = cellSteps[i-1]
-      }
-      
-      if finalCellStop == nil {
-        return
-      }
-      
-      finalGP = finalCellStop!.gridPoint
-    }
-
-    
-    moveToGridPoint(player, finalGP)
   }
 
   // MARK: INTERNAL
-  private func createCells() {
+  func createCells() {
     for c in 1...columns {
       for r in 1...rows {
         let cellNode = BoardCell(c, r)
@@ -136,7 +85,7 @@ class Board: SCNNode {
       }
     }
   }
-  private func createSpawnRect() {
+  func createSpawnRect() {
     spawnGP = GridPoint(roll(columns-2) + 1, roll(rows-2) + 1)
     let firstGP = GridPoint(spawnGP.column - 1, spawnGP.row - 1)
     let lastGP = GridPoint(spawnGP.column + 1, spawnGP.row + 1)
@@ -148,7 +97,7 @@ class Board: SCNNode {
       cell.isSpawnRegion = true
     }
   }
-  private func createPlayer() {
+  func createPlayer() {
     moveToGridPoint(player, spawnGP)
   }
   func drawAvailableZone() {
@@ -166,11 +115,11 @@ class Board: SCNNode {
       }
     }
   }
-  private func createShips() {
+  func createShips() {
     let lengthArray = [5,4,3,3,2];
     for length in lengthArray {
       while !createAndPlaceShipWithLength(length) {
-        print("failed ship placement, retrying")
+        // noop
       }
     }
   }
@@ -179,7 +128,7 @@ class Board: SCNNode {
       print("[M@] invalid length")
       return false
     }
-    let ship = ShipNode(width: length)
+    let ship = TargetShip(width: length)
     
     var success = false
     let rotations = getRotationArray()
