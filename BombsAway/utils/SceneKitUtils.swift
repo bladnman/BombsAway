@@ -115,4 +115,22 @@ func deepCopyNode(_ node: SCNNode) -> SCNNode {
   
   return clone
 }
+func getAncestorWithName(_ node: SCNNode?, name: String) -> SCNNode? {
+  if node == nil { return nil }
+  if node?.name == name { return node }
+  return getAncestorWithName(node?.parent, name: name)
+}
+func getChildWithName(_ children: [SCNNode]?, name: String) -> SCNNode? {
+  if children == nil || children!.isEmpty { return nil }
+  
+  // first child with this name
+  if let foundChild = children!.first(where: { $0.name == name }) {
+    return foundChild
+  }
 
+  // search kids for this name
+  for child in children! {
+    return getChildWithName(child.childNodes, name: name)
+  }
+  return nil
+}

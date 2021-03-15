@@ -7,49 +7,39 @@
 import SceneKit
 import UIKit
 extension Board {
-  func movePlayerShipTo(_ gp: GridPoint, force: Bool = false) {
-    guard force || isValidMove(gp) else {
-      return
-    }
+  func stepPlayerShipTo(_ gp: GridPoint) {
+    // invalid move - bail
+    guard isValidMove(gp) else { return }
     
-    var finalGP = gp
+    var stepCellList = cellListForJourney(startGP: player.gridPoint, endGP: gp)
     
-    if !force {
-      // must find ships in the way
-      let diagonals = cellListForDiagonalsBetween(startGP: player.gridPoint, endGP: gp)
-      let straights = cellListForStraightsBetween(startGP: player.gridPoint, endGP: gp)
-      let cellSteps = diagonals + straights
-      
-      // no steps
-      if cellSteps.isEmpty {
-        return
+    // first cell is where the playerShip is now
+    stepCellList.removeFirst()
+    
+    if let stepCell = stepCellList.first {
+      // HIT SHIP ! !  - no move
+      if stepCell.hasSolidShip {
+        stepCell.targetShipRef?.hitAt(stepCell.gridPoint)
       }
       
-      var finalCellStop = cellSteps.last
-      if let i = cellSteps.firstIndex(where: { $0.hasSolidShip }) {
-        
-        // YOU HIT A SHIP
-        let shipCell = cellSteps[i]
-        if let targetShip = shipCell.targetShipRef {
-          if targetShip.hitAt(shipCell.gridPoint) {
-            if targetShip.isSunk {
-              print("[M@] DUDE! YOU SUNK MY BATTLESHIP! \(String(describing: shipCell.gridPoint))")
-            } else {
-              print("[M@] we hit! \(String(describing: shipCell.gridPoint))")
+      // just move
+      else {
+        if let nextStepGP = stepCell.gridPoint {
+          let moveAction = SCNAction.move(to: positionForGridPoint(nextStepGP), duration: C_MOVE.Player.perCellSec)
+          let pauseAction = SCNAction.wait(duration: C_MOVE.Player.perCellPauseSec)
+          
+          player.runAction(SCNAction.sequence([moveAction, pauseAction])) {
+            self.drawAvailableZone()
+            
+            // not there yet - keep steppin'!
+            if nextStepGP != gp {
+              DispatchQueue.main.async {
+                self.stepPlayerShipTo(gp)
+              }
             }
           }
         }
-        finalCellStop = cellSteps[i-1]
       }
-      
-      if finalCellStop == nil {
-        return
-      }
-      
-      finalGP = finalCellStop!.gridPoint
     }
-
-    
-    moveToGridPoint(player, finalGP)
   }
 }

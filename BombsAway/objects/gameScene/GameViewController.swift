@@ -52,10 +52,10 @@ class GameViewController: UIViewController {
       
       let resultNode = result.node
       if let boardCellFloor = hitResults.first(where: { $0.node.name == C_OBJ_NAME.cellFloor })?.node {
-        if let boardCell = boardCellFloor.parent as? BoardCell {
+        if let boardCell = getAncestorWithName(boardCellFloor, name: C_OBJ_NAME.boardCell) as? BoardCell {
           if boardCell.mode == .move {
             if let board = boardCell.parent?.parent as? Board {
-              board.movePlayerShipTo(boardCell.gridPoint)
+              board.stepPlayerShipTo(boardCell.gridPoint)
             }
           }
         }

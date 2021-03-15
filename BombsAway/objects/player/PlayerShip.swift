@@ -9,7 +9,7 @@ import SceneKit
 
 class PlayerShip: SCNNode {
   let NAME = C_OBJ_NAME.player
-  var stepSize: Int = 2
+  var stepSize: Int = 10
   var gridPoint: GridPoint {
     get {
       return GridPoint(Int(position.x), Int(position.z))
@@ -26,6 +26,15 @@ class PlayerShip: SCNNode {
     boxGeometry.firstMaterial?.emission.intensity = 0.8
     
     self.geometry = boxGeometry
+  }
+  
+  override func removeAllActions() {
+    print("[M@] player is being told to stop all actions!")
+    super.removeAllActions()
+  }
+  override func removeAction(forKey key: String) {
+    print("[M@] player is being told to stop action named [\(key)]")
+    super.removeAction(forKey: key)
   }
   
   required init?(coder: NSCoder) {

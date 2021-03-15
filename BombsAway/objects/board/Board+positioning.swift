@@ -7,35 +7,6 @@
 import SceneKit
 import UIKit
 extension Board {
-
-  // MARK: POSITIONING
-  func moveToGridPoint(_ node: SCNNode, _ gp: GridPoint) {
-    let newToGrid = node.parent != boardGeom
-    if newToGrid {
-      boardGeom.addChildNode(node)
-    }
-    
-    let newPosition = positionForGridPoint(gp)
-
-    // JUST ADD NEW ITEMS
-    if newToGrid {
-      node.position = newPosition
-    }
-
-    // MOVE ACTION
-    else {
-      node.removeAllActions()
-
-      let duration = 0.3
-      let moveAction = SCNAction.move(to: newPosition, duration: duration)
-      moveAction.timingMode = .easeInEaseOut
-      
-      node.runAction(moveAction, completionHandler: {
-        node.removeAllActions()
-        self.drawAvailableZone()
-      })
-    }
-  }
   func positionShip(_ ship: TargetShip, _ startGP: GridPoint) {
     let boardRange = BoardRange(startGP, ship.boardSize)
     let positionFrame = boxForRange(boardRange)

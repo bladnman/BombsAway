@@ -66,13 +66,15 @@ struct Constants {
     }
   }
   struct Movement {
-    struct Input {
-      static let multiplier: CGFloat = 18.0
+    struct Player {
+      static let perCellSec = 0.05
+      static let perCellPauseSec = 0.01
     }
-    struct Toss {
-      static let xMax: CGFloat = 75
-      static let yMax: CGFloat = 200
+    struct BoardCell {
+      struct SelectIndicator {
+        static let fadeInSec = 0.01
+        static let fadeOutSec = 0.9
+      }
     }
-    
   }
 }

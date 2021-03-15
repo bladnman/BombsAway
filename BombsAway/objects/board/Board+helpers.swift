@@ -120,9 +120,13 @@ extension Board {
     
     return outCellList
   }
-  func cellListForDiagonalsBetween(startGP: GridPoint, endGP: GridPoint) -> [BoardCell] {
-    if !startGP.isDiagonalTo(endGP) {
-      return []
+  func cellListForDiagonals(startGP: GridPoint, endGP: GridPoint) -> [BoardCell] {
+    if !isValid(startGP) || !isValid(endGP) { return [] }
+    if !startGP.isDiagonalTo(endGP) { return [] }
+    
+    // same gp
+    if startGP == endGP {
+      return [cellFor(startGP)!]
     }
     
     var outCellList = [BoardCell]()
@@ -142,9 +146,13 @@ extension Board {
     }
     return outCellList
   }
-  func cellListForStraightsBetween(startGP: GridPoint, endGP: GridPoint) -> [BoardCell] {
-    if !startGP.isStraightTo(endGP) {
-      return []
+  func cellListForStraights(startGP: GridPoint, endGP: GridPoint) -> [BoardCell] {
+    if !isValid(startGP) || !isValid(endGP) { return [] }
+    if !startGP.isStraightTo(endGP) { return [] }
+    
+    // same gp
+    if startGP == endGP {
+      return [cellFor(startGP)!]
     }
     
     var outCellList = [BoardCell]()
@@ -175,6 +183,11 @@ extension Board {
     }
 
     return outCellList
+  }
+  func cellListForJourney(startGP: GridPoint, endGP: GridPoint) -> [BoardCell] {
+    let possibleDiagonals = cellListForDiagonals(startGP: startGP, endGP: endGP)
+    let possibleStraights = cellListForStraights(startGP: startGP, endGP: endGP)
+    return possibleDiagonals + possibleStraights
   }
   
   // MARK: CELL CONVINIENCE

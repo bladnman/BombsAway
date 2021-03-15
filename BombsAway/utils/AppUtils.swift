@@ -42,16 +42,22 @@ func dumpHitResults(_ hitResults: [SCNHitTestResult], _ name: String? = nil) {
 }
 
 struct Models {
-  private static let blueCoinScene = SCNScene(named: "art.scnassets/coin-test.scn")!
-  static let blueCoin = blueCoinScene.rootNode.childNode(withName: "cointest", recursively: true)!
+  static let blueCoin = loadNodeFromScene(sceneName: "art.scnassets/coin-test.scn", nodeName: "cointest")!
+  static let redCoin = loadNodeFromScene(sceneName: "art.scnassets/coin-test-red.scn", nodeName: "cointest")!
+  static let boardCell = loadNodeFromScene(sceneName: "boardCell.scnassets/Base.scn", nodeName: "node")!
+  static let cellFloor = loadNodeFromScene(sceneName: "boardCell.scnassets/Floor.scn", nodeName: C_OBJ_NAME.cellFloor)!
+  static let selectableIndicator = loadNodeFromScene(sceneName: "boardCell.scnassets/SelectableIndicator.scn", nodeName: "node")!
+}
+func loadNodeFromScene(sceneName: String, nodeName: String) -> SCNNode? {
+  if let scene = SCNScene(named: sceneName) {
+    if let node = scene.rootNode.childNode(withName: nodeName, recursively: true) {
+      return node
+    } else {
+      print("[M@] ERROR: NODE NOT FOUND IN SCENE: sceneName:[\(sceneName)] looking for nodeName:[\(nodeName)]")
+    }
+  } else {
+    print("[M@] ERROR: SCENE NOT FOUND: [\(sceneName)]")
+  }
   
-  private static let redCoinScene = SCNScene(named: "art.scnassets/coin-test-red.scn")!
-  static let redCoin = redCoinScene.rootNode.childNode(withName: "cointest", recursively: true)!
-  
-  private static let boardCellScene = SCNScene(named: "boardCell.scnassets/Base.scn")!
-  static let boardCell = boardCellScene.rootNode.childNode(withName: "node", recursively: true)!
-
-  private static let boardCellFloorScene = SCNScene(named: "boardCell.scnassets/Floor.scn")!
-  static let cellFloor = boardCellFloorScene.rootNode.childNode(withName: "cellFloor", recursively: true)!
-  
+  return nil
 }

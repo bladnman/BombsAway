@@ -61,9 +61,9 @@ class Board: SCNNode {
   // MARK: EXTERNAL
   func removeAllShips() {
     // remove all ships
-    boardGeom.enumerateChildNodes { node, _ in
-      if node.name == C_OBJ_NAME.ship {
-        node.removeFromParentNode()
+    boardGeom.enumerateChildNodes { boardChild, _ in
+      if boardChild.name == C_OBJ_NAME.ship {
+        boardChild.removeFromParentNode()
       }
     }
     
@@ -98,7 +98,8 @@ class Board: SCNNode {
     }
   }
   func createPlayer() {
-    moveToGridPoint(player, spawnGP)
+    boardGeom.addChildNode(player)
+    player.position = positionForGridPoint(spawnGP)
   }
   func drawAvailableZone() {
     cellList.forEach { (_, cell) in

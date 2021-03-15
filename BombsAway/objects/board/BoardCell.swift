@@ -27,6 +27,7 @@ class BoardCell: SCNNode {
   var potentialIndicator: SCNNode?
   var spawnPointIndicator: SCNNode?
   var spawnAreaIndicator: SCNNode?
+  var selectableIndicator: SCNNode!
   
   
   var floorColor: UIColor {
@@ -66,7 +67,6 @@ class BoardCell: SCNNode {
     self.name = NAME
 
     installBaseScene()
-    updateLabel()
   }
 
   @available(*, unavailable)
@@ -76,18 +76,68 @@ class BoardCell: SCNNode {
   
   func installBaseScene() {
     baseNode = deepCopyNode(Models.boardCell)
-    floor = baseNode.childNodes.first { $0.name == C_OBJ_NAME.cellFloor }
     addChildNode(baseNode)
-    // set colors
-    updateFloor()
+    
+    floor = getChildWithName(baseNode.childNodes, name: C_OBJ_NAME.cellFloor)
+
+    selectableIndicator = deepCopyNode(Models.selectableIndicator)
+    selectableIndicator.opacity = 0.0
+    addChildNode(selectableIndicator)
+    
+    
+    update()
   }
+  
+  
+  // MARK: UPDATES
   func update() {
     updateFloor()
     updateLabel()
     updateHitNode()
+    updateSelectableIndicator()
   }
   func updateFloor() {
     floor?.geometry?.firstMaterial?.diffuse.contents = floorColor
+  }
+  func updateSelectableIndicator() {
+    
+    if mode == .move {
+      showSelectableIndicator()
+//      selectableIndicator?.position = SCNVector3(0, -0.2, 0)
+//      selectableIndicator?.opacity = 0.0
+//      let fadeAction = SCNAction.fadeIn(duration: 0.75)
+//      let moveAction = SCNAction.move(to: SCNVector3(0, 0.1 ,0), duration: 0.5)
+//      moveAction.timingMode = .easeOut
+//      selectableIndicator!.runAction(SCNAction.group([moveAction, fadeAction]))
+      
+    } else {
+      hideSelectableIndicator()
+//      if let node = self.selectableIndicator {
+//        let fadeAction = SCNAction.fadeOut(duration: 0.3)
+//        let moveAction = SCNAction.move(to: SCNVector3(0, -0.2, 0), duration: 0.3)
+//        moveAction.timingMode = .easeOut
+//        node.runAction(SCNAction.group([moveAction, fadeAction])) {
+//          node.removeFromParentNode()
+//        }
+//      }
+    }
+  }
+  func showSelectableIndicator(_ duration: Double = C_MOVE.BoardCell.SelectIndicator.fadeInSec) {
+    
+    selectableIndicator.removeAction(forKey: "fadeIn")
+    selectableIndicator.removeAction(forKey: "fadeOut")
+
+    let fadeAction = SCNAction.fadeIn(duration: duration)
+    fadeAction.timingMode = .easeInEaseOut
+    selectableIndicator!.runAction(fadeAction, forKey: "fadeIn")
+  }
+  func hideSelectableIndicator(_ duration: Double = C_MOVE.BoardCell.SelectIndicator.fadeOutSec) {
+    selectableIndicator.removeAction(forKey: "fadeIn")
+    selectableIndicator.removeAction(forKey: "fadeOut")
+    
+    let fadeAction = SCNAction.fadeOut(duration: duration)
+    fadeAction.timingMode = .easeOut
+    selectableIndicator!.runAction(fadeAction, forKey: "fadeOut")
   }
 
   // MARK: LABEL
