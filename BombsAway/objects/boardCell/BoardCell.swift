@@ -39,6 +39,7 @@ class BoardCell: SCNNode {
   var spawnPointIndicator: SCNNode?
   var spawnAreaIndicator: SCNNode?
   var selectableIndicator: SCNNode!
+  var probabilityIndicator: SCNNode?
   
   
   var floorColor: UIColor {
@@ -112,6 +113,13 @@ class BoardCell: SCNNode {
     addChildNode(selectableIndicator)
     
     update()
+    if chance(5) {
+      addProbabilityIndicator()
+    }
+  }
+  func addProbabilityIndicator() {
+    probabilityIndicator = deepCopyNode(Models.probabilityIndicator)
+    addChildNode(probabilityIndicator!)
   }
   
   

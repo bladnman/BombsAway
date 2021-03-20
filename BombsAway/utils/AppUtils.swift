@@ -49,6 +49,7 @@ struct Models {
   static let selectableIndicator: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/SelectableIndicator.scn", nodeName: "node")!
   static let cellProbe: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/Probe.scn", nodeName: "node")!
   static let playerShip: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/PlayerShip.scn", nodeName: "node")!
+  static let probabilityIndicator: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/ProbabilityIndicator.scn", nodeName: "node")!
 }
 func loadNodeFromScene(sceneName: String, nodeName: String) -> SCNNode? {
   if let scene = SCNScene(named: sceneName) {
