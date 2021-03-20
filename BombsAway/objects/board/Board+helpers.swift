@@ -6,31 +6,34 @@
 //
 import SceneKit
 import UIKit
+enum Direction {
+  case n,e,s,w,ne,se,sw,nw
+}
 extension Board {
   
   // MARK: CELL GETTERS
 
   func cellListFor(_ boardRange: BoardRange) -> [BoardCell] {
-    var cellList = [BoardCell]()
+    var cells = [BoardCell]()
     for c in boardRange.columnRange {
       for r in boardRange.rowRange {
         if let cell = cellFor(GridPoint(c, r)) {
-          cellList.append(cell)
+          cells.append(cell)
         }
       }
     }
-    return cellList
+    return cells
   }
   func cellListFor(_ boardRect: BoardRect) -> [BoardCell] {
-    var cellList = [BoardCell]()
+    var cells = [BoardCell]()
     for c in boardRect.firstGP.column...boardRect.lastGP.column {
       for r in boardRect.firstGP.row...boardRect.lastGP.row {
         if let cell = cellFor(GridPoint(c, r)) {
-          cellList.append(cell)
+          cells.append(cell)
         }
       }
     }
-    return cellList
+    return cells
   }
   func cellListFor(_ centerGP: GridPoint, radius: Int = 0) -> [BoardCell] {
     return cellListFor(BoardRange(columnRange: centerGP.column...centerGP.column, rowRange: centerGP.row...centerGP.row))
@@ -84,18 +87,36 @@ extension Board {
     let colMax = min(columns, centerGP.column + radius)
     let rowMin = max(1, centerGP.row - radius)
     let rowMax = min(rows, centerGP.row + radius)
-    
+    return cellListForStraights(centerGP, columnRange: colMin...colMax, rowRange: rowMin...rowMax)
+  }
+  func cellListForStraights(_ centerGP: GridPoint, columnRange: ClosedRange<Int>, rowRange: ClosedRange<Int>) -> [BoardCell] {
     var outCellList = [BoardCell]()
     
     // horizontal
-    for c in colMin...colMax {
+    for c in columnRange {
       if let cell = cellFor(c, centerGP.row) {
         outCellList.append(cell)
       }
     }
     // vertical
-    for r in rowMin...rowMax {
+    for r in rowRange {
       if let cell = cellFor(centerGP.column, r) {
+        outCellList.append(cell)
+      }
+    }
+    
+    return outCellList
+  }
+  func cellListForDiagonals(_ centerGP: GridPoint, columnRange: ClosedRange<Int>) -> [BoardCell] {
+    var outCellList = [BoardCell]()
+    
+    for c in columnRange {
+      let deltaFromCenter = c - centerGP.column
+      
+      if let cell = cellFor(c, centerGP.row + deltaFromCenter) {
+        outCellList.append(cell)
+      }
+      if let cell = cellFor(c, centerGP.row - deltaFromCenter) {
         outCellList.append(cell)
       }
     }
@@ -188,6 +209,85 @@ extension Board {
     let possibleDiagonals = cellListForDiagonals(startGP: startGP, endGP: endGP)
     let possibleStraights = cellListForStraights(startGP: startGP, endGP: endGP)
     return possibleDiagonals + possibleStraights
+  }
+  func cellListForDirection(_ startGP: GridPoint, radius: Int, direction: Direction, includeStartGP: Bool = true) -> [BoardCell] {
+    
+    var startColumn = startGP.column
+    var startRow = startGP.row
+    
+    if !includeStartGP {
+      switch direction {
+        case .n: startRow -= 1
+        case .e: startColumn += 1
+        case .s: startRow += 1
+        case .w: startColumn -= 1
+        case .ne:
+          startRow -= 1
+          startColumn += 1
+        case .se:
+          startRow += 1
+          startColumn += 1
+        case .sw:
+          startRow += 1
+          startColumn -= 1
+        case .nw:
+          startRow -= 1
+          startColumn -= 1
+        }
+    }
+    
+    let actualStartGP = GridPoint(startColumn, startRow)
+    let actualRadius = includeStartGP ? radius - 1 : radius - 2
+    
+    // nothing to do - bail
+    if actualRadius < 0 {
+      return [BoardCell]()
+    }
+    
+    var colMin = actualStartGP.column - actualRadius
+    var colMax = actualStartGP.column + actualRadius
+    var rowMin = actualStartGP.row - actualRadius
+    var rowMax = actualStartGP.row + actualRadius
+
+    
+    // clamp columns
+    if !isLeft(direction) {
+      colMin = actualStartGP.column
+    }
+    if !isRight(direction) {
+      colMax = actualStartGP.column
+    }
+    // clamp rows
+    if !isUp(direction) {
+      rowMin = actualStartGP.row
+    }
+    if !isDown(direction) {
+      rowMax = actualStartGP.row
+    }
+    
+    switch direction {
+      case .n,.e,.s,.w:
+        return cellListForStraights(actualStartGP, columnRange: colMin...colMax, rowRange: rowMin...rowMax)
+      case .ne,.se,.sw,.nw:
+        var outCellList = [BoardCell]()
+        for c in colMin...colMax {
+          let deltaFromCenter = c - actualStartGP.column
+          
+          if direction == .nw || direction == .se {
+            if let cell = cellFor(c, actualStartGP.row + deltaFromCenter) {
+              outCellList.append(cell)
+            }
+          }
+          if direction == .sw || direction == .ne {
+            let gp = GridPoint(c, actualStartGP.row - deltaFromCenter)
+            if let cell = cellFor(gp) {
+              outCellList.append(cell)
+            }
+          }
+        }
+        return outCellList
+    }
+    
   }
   
   // MARK: CELL CONVINIENCE

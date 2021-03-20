@@ -43,13 +43,19 @@ func dumpHitResults(_ hitResults: [SCNHitTestResult], _ name: String? = nil) {
 
 struct Models {
   static let blueCoin: SCNNode = loadNodeFromScene(sceneName: "art.scnassets/coin-test.scn", nodeName: "cointest")!
-  static let redCoin: SCNNode = loadNodeFromScene(sceneName: "art.scnassets/coin-test-red.scn", nodeName: "cointest")!
+  static let redCoin: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/coin-test-red.scn", nodeName: "cointest")!
   static let boardCell: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/Base.scn", nodeName: "node")!
   static let cellFloor: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/Floor.scn", nodeName: C_OBJ_NAME.cellFloor)!
   static let selectableIndicator: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/SelectableIndicator.scn", nodeName: "node")!
   static let cellProbe: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/Probe.scn", nodeName: "node")!
   static let playerShip: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/PlayerShip.scn", nodeName: "node")!
-  static let probabilityIndicator: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/ProbabilityIndicator.scn", nodeName: "node")!
+  static let _probabilityIndicator: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/ProbabilityIndicator.scn", nodeName: "node")!
+  
+  static var probabilityIndicator: ProbabilityIndicator {
+    get {
+      return ProbabilityIndicator(deepCopyNode(_probabilityIndicator))
+    }
+  }
 }
 func loadNodeFromScene(sceneName: String, nodeName: String) -> SCNNode? {
   if let scene = SCNScene(named: sceneName) {
@@ -63,5 +69,37 @@ func loadNodeFromScene(sceneName: String, nodeName: String) -> SCNNode? {
   }
   
   return nil
+}
+func isUp(_ direction: Direction) -> Bool {
+  switch direction {
+  case .nw,.n,.ne:
+    return true
+  default:
+    return false
+  }
+}
+func isDown(_ direction: Direction) -> Bool {
+  switch direction {
+  case .sw,.s,.se:
+    return true
+  default:
+    return false
+  }
+}
+func isRight(_ direction: Direction) -> Bool {
+  switch direction {
+  case .ne,.e,.se:
+    return true
+  default:
+    return false
+  }
+}
+func isLeft(_ direction: Direction) -> Bool {
+  switch direction {
+  case .nw,.w,.sw:
+    return true
+  default:
+    return false
+  }
 }
 

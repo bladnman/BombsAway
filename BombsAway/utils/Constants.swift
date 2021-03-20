@@ -18,6 +18,7 @@ typealias C_ANIS = Constants.Anis
 typealias C_MOVE = Constants.Movement
 typealias C_CELL_MODE = Constants.Cell.Modes
 typealias C_COLOR = Constants.Colors
+typealias C_BOARD = Constants.Board
 typealias C_DBG = Constants.Debug
 
 struct Constants {
@@ -70,6 +71,15 @@ struct Constants {
       }
     }
   }
+  struct Board {
+    struct Size {
+      static let columns = 10
+      static let rows = 10
+    }
+    struct ProbabilityIndicator {
+      static let radius = 3
+    }
+  }
   struct Movement {
     struct Player {
       static let initialStepsPerMove = 2
@@ -81,6 +91,7 @@ struct Constants {
         static let fadeInSec = 0.01
         static let fadeOutSec = 0.9
       }
+
     }
   }
   struct Colors {

@@ -23,12 +23,12 @@ class TargetShip: SCNNode {
     super.init()
     self.name = self.NAME
 
-    let boxGeometry = SCNBox(width: CGFloat(width), height: 1.0, length: 1.0, chamferRadius: 0.04)
+    let boxGeometry = SCNBox(width: CGFloat(width), height: 0.2, length: 0.5, chamferRadius: 0.04)
     boxGeometry.firstMaterial?.diffuse.contents = color
     self.geometry = boxGeometry
     
     // PIVOT POINT:  left, bottom, 1/2 length
-    self.pivot = SCNMatrix4MakeTranslation(-0.5 * Float(width), -0.5, 0.0)
+    self.pivot = SCNMatrix4MakeTranslation(-0.5 * Float(width), -0.1, 0.0)
 
 //    showPivotIndicator()
   }

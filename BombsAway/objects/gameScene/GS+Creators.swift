@@ -93,7 +93,7 @@ extension GameViewController {
     }
 
     // ATTACK BOARD
-    attackBoard = Board(sceneView: sceneView, columns: 10, rows: 10, isOwn: false)
+    attackBoard = Board(sceneView: sceneView, columns: C_BOARD.Size.columns, rows: C_BOARD.Size.rows, isOwn: false)
     if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "backBoardNode" }) {
       attackBoard.position = SCNVector3(-0.5, 0, -0.5)
       attackBoard.name = C_OBJ_NAME.attackBoard

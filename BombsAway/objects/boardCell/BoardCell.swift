@@ -8,6 +8,7 @@
 import SceneKit
 protocol BoardCellDelegate {
   func bcellGetSurroundingProbeCount(_ gp: GridPoint) -> Int
+  func bcellGetSurroundingThreats(_ gp: GridPoint) -> ThreatDirections
 }
 class BoardCell: SCNNode {
   
@@ -39,28 +40,12 @@ class BoardCell: SCNNode {
   var spawnPointIndicator: SCNNode?
   var spawnAreaIndicator: SCNNode?
   var selectableIndicator: SCNNode!
-  var probabilityIndicator: SCNNode?
+  var probabilityIndicator: ProbabilityIndicator?
   
   
   var floorColor: UIColor {
-    return probability.getFloorColor()
-    
-    
-//    switch mode {
-//    case .highlight:
-//      return UIColor.fromHex("#778ca3")
-//    case .move:
-//      return UIColor.fromHex("#3e4852")
-//    default:
-//      break
-//    }
-//    if isHighlighted {
-//      return UIColor.fromHex("#778ca3")
-//    }
-//    if isSpawnRegion {
-//      return UIColor.fromHex("#303952")
-//    }
-//    return UIColor.fromHex("#34495e")
+    return UIColor.fromHex("#34495e")
+//    return probability.getFloorColor()
   }
 
   // MARK: ISers
@@ -113,13 +98,6 @@ class BoardCell: SCNNode {
     addChildNode(selectableIndicator)
     
     update()
-    if chance(5) {
-      addProbabilityIndicator()
-    }
-  }
-  func addProbabilityIndicator() {
-    probabilityIndicator = deepCopyNode(Models.probabilityIndicator)
-    addChildNode(probabilityIndicator!)
   }
   
   
@@ -128,7 +106,7 @@ class BoardCell: SCNNode {
     updateFloor()
     updateLabel()
     updateHitNode()
-    updateSelectableIndicator()
+//    updateSelectableIndicator()
   }
   func updateFloor() {
     floor?.geometry?.firstMaterial?.diffuse.contents = floorColor
@@ -228,29 +206,53 @@ class BoardCell: SCNNode {
   
   // MARK: PROBE
   func updateProbe() {
-    if hasProbe {
-      showProbe()
-    } else {
-      hideProbe()
+    DispatchQueue.main.async {
+//      if self.hasProbe {
+//        self.showProbe()
+//      } else {
+//        self.hideProbe()
+//      }
+      
+      self.updateProbabilityIndicator()
     }
   }
   func showProbe() {
-    // already showing probe - bail
+    // already showing - bail
     guard probe == nil else { return }
-    
     probe = Models.cellProbe.clone()
     addChildNode(probe!)
-    
-//    let gaussianBlur    = CIFilter(name: "CIGaussianBlur")
-//    gaussianBlur?.name  = "blur"
-//    gaussianBlur?.setValue(1, forKey: "inputRadius")
-//    probe?.filters        = [gaussianBlur] as? [CIFilter]
   }
   func hideProbe() {
-    // not showing probe - bail
+    // not showing - bail
     guard probe != nil else { return }
-    
     probe?.removeFromParentNode()
     probe = nil
+  }
+  
+  
+  // MARK: PROBABILITY INDICATOR
+  func updateProbabilityIndicator() {
+    if hasProbe {
+      showProbabilityIndicator()
+      // get new threats
+      if let threats = delegate?.bcellGetSurroundingThreats(gridPoint) {
+        probabilityIndicator?.threats = threats
+      }
+    } else {
+      hideProbabilityIndicator()
+    }
+  }
+  func showProbabilityIndicator() {
+    // already showing - bail
+    guard probabilityIndicator == nil else { return }
+    probabilityIndicator = Models.probabilityIndicator
+
+    addChildNode(probabilityIndicator!)
+  }
+  func hideProbabilityIndicator() {
+    // not showing - bail
+    guard probabilityIndicator != nil else { return }
+    probabilityIndicator?.removeFromParentNode()
+    probabilityIndicator = nil
   }
 }
