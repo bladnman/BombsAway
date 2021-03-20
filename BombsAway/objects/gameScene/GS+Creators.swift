@@ -17,7 +17,7 @@ extension GameViewController {
     createCamera()
     createLights()
     createBoard()
-    createOriginIndicator(scene.rootNode)
+//    createOriginIndicator(scene.rootNode)
   }
   func resetGame() {
     scene.rootNode.enumerateChildNodes { node, _ in
@@ -45,7 +45,7 @@ extension GameViewController {
 //      SCNDebugOptions.renderAsWireframe,
 //      SCNDebugOptions.showCreases,
     ]
-
+    
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
     sceneView.addGestureRecognizer(tapGesture)
   }

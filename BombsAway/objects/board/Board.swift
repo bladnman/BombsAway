@@ -79,9 +79,16 @@ class Board: SCNNode {
     for c in 1...columns {
       for r in 1...rows {
         let cellNode = BoardCell(c, r)
+        cellNode.delegate = self
         cellNode.position = positionForGridPoint(GridPoint(c, r))
         boardGeom.addChildNode(cellNode)
         setCell(c, r, node: cellNode)
+        
+        // temporary test code, drop some free probes
+        if chance(5) {
+          cellNode.hasProbe = true
+        }
+        
       }
     }
   }

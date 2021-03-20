@@ -41,13 +41,13 @@ extension Board {
     let rowMin = max(1, centerGP.row - radius)
     let rowMax = min(rows, centerGP.row + radius)
     
-    var outCellList = [BoardCell]()
+    var outCellDict = [String: BoardCell]()
     
     // top (only if not cut off)
     if rowMin == centerGP.row - radius {
       for c in colMin...colMax {
         if let cell = cellFor(c, rowMin) {
-          outCellList.append(cell)
+          outCellDict[cell.gridPoint.toString()] = cell
         }
       }
     }
@@ -55,7 +55,7 @@ extension Board {
     if rowMax == centerGP.row + radius {
       for c in colMin...colMax {
         if let cell = cellFor(c, rowMax) {
-          outCellList.append(cell)
+          outCellDict[cell.gridPoint.toString()] = cell
         }
       }
     }
@@ -64,7 +64,7 @@ extension Board {
     if colMin == centerGP.column - radius {
       for r in rowMin...rowMax {
         if let cell = cellFor(colMin, r) {
-          outCellList.append(cell)
+          outCellDict[cell.gridPoint.toString()] = cell
         }
       }
     }
@@ -72,12 +72,12 @@ extension Board {
     if colMax == centerGP.column + radius {
       for r in rowMin...rowMax {
         if let cell = cellFor(colMax, r) {
-          outCellList.append(cell)
+          outCellDict[cell.gridPoint.toString()] = cell
         }
       }
     }
     
-    return outCellList
+    return [BoardCell](outCellDict.values)
   }
   func cellListForStraights(_ centerGP: GridPoint, radius: Int) -> [BoardCell] {
     let colMin = max(1, centerGP.column - radius)

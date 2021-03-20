@@ -7,6 +7,7 @@
 
 import CoreGraphics
 import Foundation
+import UIKit
 
 typealias C = Constants
 typealias C_OBJ_NAME = Constants.Objects.Names
@@ -16,9 +17,13 @@ typealias C_ZPOS = Constants.ZPositions
 typealias C_ANIS = Constants.Anis
 typealias C_MOVE = Constants.Movement
 typealias C_CELL_MODE = Constants.Cell.Modes
+typealias C_COLOR = Constants.Colors
+typealias C_DBG = Constants.Debug
 
 struct Constants {
-  
+  struct Debug {
+    static let showHiddenShipFloors = false
+  }
   struct Objects {
     enum Names {
       static let player = "player"
@@ -67,6 +72,7 @@ struct Constants {
   }
   struct Movement {
     struct Player {
+      static let initialStepsPerMove = 2
       static let perCellSec = 0.05
       static let perCellPauseSec = 0.01
     }
@@ -76,5 +82,20 @@ struct Constants {
         static let fadeOutSec = 0.9
       }
     }
+  }
+  struct Colors {
+    static let blue = UIColor.fromHex("#22374a")
+    static let yellowLight = UIColor.fromHex("#f6e58d")
+    static let yellow = UIColor.fromHex("#f9ca24")
+    static let orangeLight = UIColor.fromHex("#ffbe76")
+    static let orange = UIColor.fromHex("#f0932b")
+    static let redLight = UIColor.fromHex("#ff7979")
+    static let red = UIColor.fromHex("#eb4d4b")
+    static let greenLight = UIColor.fromHex("#badc58")
+    static let green = UIColor.fromHex("#6ab04c")
+    static let lightBlueLight = UIColor.fromHex("#7ed6df")
+    static let lightBlue = UIColor.fromHex("#22a6b3")
+//    static let blueLight = UIColor.fromHex("#686de0")
+//    static let blue = UIColor.fromHex("#4834d4")
   }
 }

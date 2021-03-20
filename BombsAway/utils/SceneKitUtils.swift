@@ -70,6 +70,18 @@ func createOriginIndicator(_ node: SCNNode, color: UIColor = UIColor.green) {
   originNode.name = C_OBJ_NAME.origin
   originNode.position = SCNVector3(0, 0, 0)
   node.addChildNode(originNode)
+  
+//  let gaussianBlur    = CIFilter(name: "CIGaussianBlur")
+//  gaussianBlur?.name  = "blur"
+//  gaussianBlur?.setValue(5, forKey: "inputRadius")
+//  originNode.filters        = [gaussianBlur] as? [CIFilter]
+    
+//    let gaussianBlurFilter = CIFilter(name: "CIGaussianBlur")!
+//    gaussianBlurFilter.name = "blur"
+//    let pixellateFilter = CIFilter(name:"CIPixellate")!
+//    pixellateFilter.name = "pixellate"
+//    originNode.filters = [ pixellateFilter, gaussianBlurFilter ]
+  
 }
 
 @discardableResult
@@ -87,6 +99,7 @@ func createPivotIndicator(_ node: SCNNode, color: UIColor = UIColor.green) -> SC
   pivotNode.position = SCNVector3(transform.m41, transform.m42, transform.m43)
 
   node.addChildNode(pivotNode)
+  
   return node
 }
 

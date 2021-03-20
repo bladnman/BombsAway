@@ -6,24 +6,35 @@
 //
 
 import SceneKit
-
+protocol BoardCellDelegate {
+  func bcellGetSurroundingProbeCount(_ gp: GridPoint) -> Int
+}
 class BoardCell: SCNNode {
+  
   let NAME: String = C_OBJ_NAME.boardCell
+  var probability: CellProbabilityController!
+  var delegate: BoardCellDelegate?
+  // data
   let gridPoint: GridPoint!
   var mode = C_CELL_MODE.none { didSet { update() } }
-
+  
   // MARK: CELL ELEMENTS
   // only one of:
-  var targetShipRef: TargetShip?
-  var collectable: SCNNode?
-  var shotStatusIndicator: SCNNode?
-  
   var baseNode: SCNNode!
   var floor: SCNNode!
+  var targetShipRef: TargetShip? {
+    didSet {
+      DispatchQueue.main.async {
+        self.update()
+      }
+    }
+  }
+  var collectable: SCNNode?
+  var shotStatusIndicator: SCNNode?
+  var probe: SCNNode?
   
   // any number of:
   var gpLabel: SCNNode?
-  var probe: SCNNode?
   var potentialIndicator: SCNNode?
   var spawnPointIndicator: SCNNode?
   var spawnAreaIndicator: SCNNode?
@@ -31,21 +42,24 @@ class BoardCell: SCNNode {
   
   
   var floorColor: UIColor {
-    switch mode {
-    case .highlight:
-      return UIColor.fromHex("#778ca3")
-    case .move:
-      return UIColor.fromHex("#3e4852")
-    default:
-      break
-    }
-    if isHighlighted {
-      return UIColor.fromHex("#778ca3")
-    }
-    if isSpawnRegion {
-      return UIColor.fromHex("#303952")
-    }
-    return UIColor.fromHex("#34495e")
+    return probability.getFloorColor()
+    
+    
+//    switch mode {
+//    case .highlight:
+//      return UIColor.fromHex("#778ca3")
+//    case .move:
+//      return UIColor.fromHex("#3e4852")
+//    default:
+//      break
+//    }
+//    if isHighlighted {
+//      return UIColor.fromHex("#778ca3")
+//    }
+//    if isSpawnRegion {
+//      return UIColor.fromHex("#303952")
+//    }
+//    return UIColor.fromHex("#34495e")
   }
 
   // MARK: ISers
@@ -58,13 +72,22 @@ class BoardCell: SCNNode {
   var hasAnyShip: Bool { return targetShipRef != nil }
   var isClearForShipPlacement: Bool { return !hasAnyShip && !isSpawnRegion }
   var isClearForMovement: Bool { return !hasSolidShip }
+  var hasCollectible: Bool = false
+  var hasProbe: Bool = false {
+    didSet {
+      updateProbe()
+    }
+  }
   
   
   init(_ column: Int, _ row: Int) {
     self.gridPoint = GridPoint(column, row)
-    super.init()
 
+    super.init()
+    
     self.name = NAME
+    
+    self.probability = CellProbabilityController(self)
 
     installBaseScene()
   }
@@ -84,6 +107,9 @@ class BoardCell: SCNNode {
     selectableIndicator.opacity = 0.0
     addChildNode(selectableIndicator)
     
+    selectableIndicator = deepCopyNode(Models.selectableIndicator)
+    selectableIndicator.opacity = 0.0
+    addChildNode(selectableIndicator)
     
     update()
   }
@@ -99,27 +125,13 @@ class BoardCell: SCNNode {
   func updateFloor() {
     floor?.geometry?.firstMaterial?.diffuse.contents = floorColor
   }
+  
+  // MARK: SELECTION INDICATOR
   func updateSelectableIndicator() {
-    
     if mode == .move {
       showSelectableIndicator()
-//      selectableIndicator?.position = SCNVector3(0, -0.2, 0)
-//      selectableIndicator?.opacity = 0.0
-//      let fadeAction = SCNAction.fadeIn(duration: 0.75)
-//      let moveAction = SCNAction.move(to: SCNVector3(0, 0.1 ,0), duration: 0.5)
-//      moveAction.timingMode = .easeOut
-//      selectableIndicator!.runAction(SCNAction.group([moveAction, fadeAction]))
-      
     } else {
       hideSelectableIndicator()
-//      if let node = self.selectableIndicator {
-//        let fadeAction = SCNAction.fadeOut(duration: 0.3)
-//        let moveAction = SCNAction.move(to: SCNVector3(0, -0.2, 0), duration: 0.3)
-//        moveAction.timingMode = .easeOut
-//        node.runAction(SCNAction.group([moveAction, fadeAction])) {
-//          node.removeFromParentNode()
-//        }
-//      }
     }
   }
   func showSelectableIndicator(_ duration: Double = C_MOVE.BoardCell.SelectIndicator.fadeInSec) {
@@ -167,33 +179,25 @@ class BoardCell: SCNNode {
   }
   
   
-  // MARK: HITS
+  // MARK: HIT INDICATOR
   func updateHitNode() {
     
     // NO SHIP - bail
     guard let targetShip = targetShipRef else {
-      removeHitCoint()
+      removeHitCoin()
       return
     }
     
     // NOT HIT - bail
     guard targetShip.isHitAt(gridPoint) else {
-      removeHitCoint()
+      removeHitCoin()
       return
     }
-    
-//    let image = UIImage(named: "art.scnassets/red-splat.png")
-//    let node = SCNNode(geometry: SCNPlane(width: 1, height: 1))
-//    node.geometry?.firstMaterial?.diffuse.contents = image
-//    node.constraints = [SCNBillboardConstraint()]
-//    node.pivot = SCNMatrix4MakeTranslation(0.0, -0.5, 0.0)
-//    addChildNode(node)
-    
     createHitCoin()
   }
   func createHitCoin() {
     // remove first (in case we toggled from hit to sunk)
-    removeHitCoint()
+    removeHitCoin()
     
     if let ship = targetShipRef {
       // NOT HIT - bail
@@ -207,9 +211,38 @@ class BoardCell: SCNNode {
       addChildNode(coin)
     }
   }
-  func removeHitCoint() {
+  func removeHitCoin() {
     childNodes
       .filter { $0.name == C_OBJ_NAME.hitcoin }
       .forEach { coin in coin.removeFromParentNode() }
+  }
+  
+  
+  // MARK: PROBE
+  func updateProbe() {
+    if hasProbe {
+      showProbe()
+    } else {
+      hideProbe()
+    }
+  }
+  func showProbe() {
+    // already showing probe - bail
+    guard probe == nil else { return }
+    
+    probe = Models.cellProbe.clone()
+    addChildNode(probe!)
+    
+//    let gaussianBlur    = CIFilter(name: "CIGaussianBlur")
+//    gaussianBlur?.name  = "blur"
+//    gaussianBlur?.setValue(1, forKey: "inputRadius")
+//    probe?.filters        = [gaussianBlur] as? [CIFilter]
+  }
+  func hideProbe() {
+    // not showing probe - bail
+    guard probe != nil else { return }
+    
+    probe?.removeFromParentNode()
+    probe = nil
   }
 }

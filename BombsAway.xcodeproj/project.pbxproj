@@ -14,6 +14,9 @@
 		6C16971225F59C2600596637 /* Board+positioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C16971125F59C2600596637 /* Board+positioning.swift */; };
 		6C39ED6E25F9A1CB005BF5C2 /* SCNNode+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C39ED6D25F9A1CB005BF5C2 /* SCNNode+ext.swift */; };
 		6C43149A25F8F8B900092D54 /* TargetShip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C43149925F8F8B900092D54 /* TargetShip.swift */; };
+		6C4DD45826002A2900832788 /* CellProbabilityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4DD45726002A2900832788 /* CellProbabilityController.swift */; };
+		6C4DD45F26002C9500832788 /* BoardCell+cellProbabilityDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4DD45E26002C9500832788 /* BoardCell+cellProbabilityDelegate.swift */; };
+		6C4DD462260033DE00832788 /* Board+boardCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4DD461260033DE00832788 /* Board+boardCellDelegate.swift */; };
 		6C5CC67C25EDD0D100BEEC7C /* MUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5CC67B25EDD09500BEEC7C /* MUtils.swift */; };
 		6C5CC68025EDD5F000BEEC7C /* BoardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5CC67F25EDD5F000BEEC7C /* BoardCell.swift */; };
 		6C60EB2025EBEFBF00A9157D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C60EB1F25EBEFBF00A9157D /* AppDelegate.swift */; };
@@ -42,6 +45,9 @@
 		6C16971125F59C2600596637 /* Board+positioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Board+positioning.swift"; sourceTree = "<group>"; };
 		6C39ED6D25F9A1CB005BF5C2 /* SCNNode+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNNode+ext.swift"; sourceTree = "<group>"; };
 		6C43149925F8F8B900092D54 /* TargetShip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetShip.swift; sourceTree = "<group>"; };
+		6C4DD45726002A2900832788 /* CellProbabilityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellProbabilityController.swift; sourceTree = "<group>"; };
+		6C4DD45E26002C9500832788 /* BoardCell+cellProbabilityDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BoardCell+cellProbabilityDelegate.swift"; sourceTree = "<group>"; };
+		6C4DD461260033DE00832788 /* Board+boardCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Board+boardCellDelegate.swift"; sourceTree = "<group>"; };
 		6C5CC67B25EDD09500BEEC7C /* MUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MUtils.swift; sourceTree = "<group>"; };
 		6C5CC67F25EDD5F000BEEC7C /* BoardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardCell.swift; sourceTree = "<group>"; };
 		6C60EB1C25EBEFBF00A9157D /* BombsAway.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BombsAway.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -88,10 +94,32 @@
 			children = (
 				6C60EB3625EC166C00A9157D /* gameScene */,
 				6C6198A225F1C009008F2794 /* board */,
+				6C4DD4662600D74400832788 /* boardCell */,
 				6C8364F325F70ED500A6E4AD /* player */,
 				6C43149825F8F89D00092D54 /* ship */,
 			);
 			path = objects;
+			sourceTree = "<group>";
+		};
+		6C4DD4662600D74400832788 /* boardCell */ = {
+			isa = PBXGroup;
+			children = (
+				6C5CC67F25EDD5F000BEEC7C /* BoardCell.swift */,
+				6C4DD45E26002C9500832788 /* BoardCell+cellProbabilityDelegate.swift */,
+				6C4DD45726002A2900832788 /* CellProbabilityController.swift */,
+			);
+			path = boardCell;
+			sourceTree = "<group>";
+		};
+		6C4DD4682600EB2200832788 /* art */ = {
+			isa = PBXGroup;
+			children = (
+				6CC0C1A825FD89D70006464D /* gamescenes.scnassets */,
+				6CC0C1AC25FD8A210006464D /* boardCell.scnassets */,
+				6C60EB2125EBEFBF00A9157D /* art.scnassets */,
+				6C60EB2825EBEFC200A9157D /* Assets.xcassets */,
+			);
+			path = art;
 			sourceTree = "<group>";
 		};
 		6C5CC67A25EDD07900BEEC7C /* utils */ = {
@@ -126,10 +154,7 @@
 		6C60EB1E25EBEFBF00A9157D /* BombsAway */ = {
 			isa = PBXGroup;
 			children = (
-				6CC0C1A825FD89D70006464D /* gamescenes.scnassets */,
-				6CC0C1AC25FD8A210006464D /* boardCell.scnassets */,
-				6C60EB2125EBEFBF00A9157D /* art.scnassets */,
-				6C60EB2825EBEFC200A9157D /* Assets.xcassets */,
+				6C4DD4682600EB2200832788 /* art */,
 				6C43149D25F8FF7E00092D54 /* objects */,
 				6C5CC67A25EDD07900BEEC7C /* utils */,
 				6CD84D7425EC66CC00F2F412 /* shaders */,
@@ -155,13 +180,13 @@
 			isa = PBXGroup;
 			children = (
 				6CD84D6C25EC2B2E00F2F412 /* Board.swift */,
-				6C5CC67F25EDD5F000BEEC7C /* BoardCell.swift */,
-				6C6198A425F1C027008F2794 /* GridPoint.swift */,
 				6C16970925F5971300596637 /* Board+tests.swift */,
 				6CC0C19825FD247C0006464D /* Board+movement.swift */,
 				6C16970D25F5974A00596637 /* Board+structs.swift */,
 				6C16971125F59C2600596637 /* Board+positioning.swift */,
 				6C16970225F5678A00596637 /* Board+helpers.swift */,
+				6C4DD461260033DE00832788 /* Board+boardCellDelegate.swift */,
+				6C6198A425F1C027008F2794 /* GridPoint.swift */,
 			);
 			path = board;
 			sourceTree = "<group>";
@@ -272,16 +297,19 @@
 				6C5CC67C25EDD0D100BEEC7C /* MUtils.swift in Sources */,
 				6CC0C19125FC3FC30006464D /* GS+input.swift in Sources */,
 				6C16970E25F5974A00596637 /* Board+structs.swift in Sources */,
+				6C4DD45F26002C9500832788 /* BoardCell+cellProbabilityDelegate.swift in Sources */,
 				6C39ED6E25F9A1CB005BF5C2 /* SCNNode+ext.swift in Sources */,
 				6C16970A25F5971300596637 /* Board+tests.swift in Sources */,
 				6C16971225F59C2600596637 /* Board+positioning.swift in Sources */,
 				6C60EB2025EBEFBF00A9157D /* AppDelegate.swift in Sources */,
 				6C16970325F5678A00596637 /* Board+helpers.swift in Sources */,
 				6C5CC68025EDD5F000BEEC7C /* BoardCell.swift in Sources */,
+				6C4DD462260033DE00832788 /* Board+boardCellDelegate.swift in Sources */,
 				6C849DBA25F06C1000232846 /* SceneKitUtils.swift in Sources */,
 				6C43149A25F8F8B900092D54 /* TargetShip.swift in Sources */,
 				6C8364F525F70EEE00A6E4AD /* PlayerShip.swift in Sources */,
 				6C1696D325F2FC3900596637 /* UIColor+ext.swift in Sources */,
+				6C4DD45826002A2900832788 /* CellProbabilityController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
