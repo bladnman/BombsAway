@@ -6,6 +6,12 @@
 //
 
 import SceneKit
+import SpriteKit
+
+enum TouchPhase {
+  case start, end
+}
+
 // https://flatuicolors.com/palette/defo
 let shipColors:[String] = [
   "#1abc9c",
@@ -42,14 +48,14 @@ func dumpHitResults(_ hitResults: [SCNHitTestResult], _ name: String? = nil) {
 }
 
 struct Models {
-  static let blueCoin: SCNNode = loadNodeFromScene(sceneName: "art.scnassets/coin-test.scn", nodeName: "cointest")!
-  static let redCoin: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/coin-test-red.scn", nodeName: "cointest")!
-  static let boardCell: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/Base.scn", nodeName: "node")!
-  static let cellFloor: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/Floor.scn", nodeName: C_OBJ_NAME.cellFloor)!
-  static let selectableIndicator: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/SelectableIndicator.scn", nodeName: "node")!
-  static let cellProbe: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/Probe.scn", nodeName: "node")!
-  static let playerShip: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/PlayerShip.scn", nodeName: "node")!
-  static let _probabilityIndicator: SCNNode = loadNodeFromScene(sceneName: "boardCell.scnassets/ProbabilityIndicator.scn", nodeName: "node")!
+  static let blueCoin: SCNNode = loadNodeFromSCNScene(sceneName: "art.scnassets/coin-test.scn", nodeName: "cointest")!
+  static let redCoin: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/coin-test-red.scn", nodeName: "cointest")!
+  static let boardCell: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/Base.scn", nodeName: "node")!
+  static let cellFloor: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/Floor.scn", nodeName: C_OBJ_NAME.cellFloor)!
+  static let selectableIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/SelectableIndicator.scn", nodeName: "node")!
+  static let cellProbe: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/Probe.scn", nodeName: "node")!
+  static let playerShip: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/PlayerShip.scn", nodeName: "node")!
+  static let _probabilityIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/ProbabilityIndicator.scn", nodeName: "node")!
   
   static var probabilityIndicator: ProbabilityIndicator {
     get {
@@ -57,9 +63,22 @@ struct Models {
     }
   }
 }
-func loadNodeFromScene(sceneName: String, nodeName: String) -> SCNNode? {
+func loadNodeFromSCNScene(sceneName: String, nodeName: String) -> SCNNode? {
   if let scene = SCNScene(named: sceneName) {
     if let node = scene.rootNode.childNode(withName: nodeName, recursively: true) {
+      return node
+    } else {
+      print("[M@] ERROR: NODE NOT FOUND IN SCENE: sceneName:[\(sceneName)] looking for nodeName:[\(nodeName)]")
+    }
+  } else {
+    print("[M@] ERROR: SCENE NOT FOUND: [\(sceneName)]")
+  }
+  
+  return nil
+}
+func loadNodeFromSKScene(sceneName: String, nodeName: String) -> SKNode? {
+  if let scene = SKScene(fileNamed: sceneName) {
+    if let node = scene.childNode(withName: nodeName) {
       return node
     } else {
       print("[M@] ERROR: NODE NOT FOUND IN SCENE: sceneName:[\(sceneName)] looking for nodeName:[\(nodeName)]")

@@ -18,6 +18,7 @@ extension GameViewController {
     createLights()
     createBoard()
 //    createOriginIndicator(scene.rootNode)
+    createHUD()
   }
   func resetGame() {
     scene.rootNode.enumerateChildNodes { node, _ in
@@ -110,6 +111,10 @@ extension GameViewController {
   }
   func removeAllShips() {
     createBoard()
+  }
+  func createHUD() {
+    gameHUD = MainHUD(size: view.frame.size, overlayDelegate: self)
+    sceneView.overlaySKScene = gameHUD
   }
 }
 

@@ -32,7 +32,15 @@
 		6C849DBA25F06C1000232846 /* SceneKitUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C849DB925F06C1000232846 /* SceneKitUtils.swift */; };
 		6CB80F38260633ED008B5376 /* ProbabilityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB80F37260633ED008B5376 /* ProbabilityIndicator.swift */; };
 		6CB80F3B26066935008B5376 /* ThreatDirections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB80F3A26066935008B5376 /* ThreatDirections.swift */; };
-		6CC0C19125FC3FC30006464D /* GS+input.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CC0C19025FC3FC30006464D /* GS+input.swift */; };
+		6CB80F3F2606B463008B5376 /* MainHUD.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6CB80F3E2606B463008B5376 /* MainHUD.sks */; };
+		6CB80F442606B7B0008B5376 /* MainHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB80F432606B7B0008B5376 /* MainHUD.swift */; };
+		6CB80F482606D563008B5376 /* SpriteKitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB80F472606D563008B5376 /* SpriteKitButton.swift */; };
+		6CB80F4C2606D604008B5376 /* LabelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB80F4B2606D604008B5376 /* LabelButton.swift */; };
+		6CB80F5526078E0D008B5376 /* HelloButton.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6CB80F5426078E0D008B5376 /* HelloButton.sks */; };
+		6CB80F582607B32F008B5376 /* TurnPanel.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6CB80F572607B32F008B5376 /* TurnPanel.sks */; };
+		6CB80F5B2607C4AE008B5376 /* TurnPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB80F5A2607C4AE008B5376 /* TurnPanel.swift */; };
+		6CB80F5E26081962008B5376 /* PlayerShipHealth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB80F5D26081962008B5376 /* PlayerShipHealth.swift */; };
+		6CC0C19125FC3FC30006464D /* GS+touches.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CC0C19025FC3FC30006464D /* GS+touches.swift */; };
 		6CC0C19925FD247C0006464D /* Board+movement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CC0C19825FD247C0006464D /* Board+movement.swift */; };
 		6CC0C1A925FD89D70006464D /* gamescenes.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CC0C1A825FD89D70006464D /* gamescenes.scnassets */; };
 		6CC0C1AD25FD8A210006464D /* boardCell.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CC0C1AC25FD8A210006464D /* boardCell.scnassets */; };
@@ -67,7 +75,15 @@
 		6C849DB925F06C1000232846 /* SceneKitUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneKitUtils.swift; sourceTree = "<group>"; };
 		6CB80F37260633ED008B5376 /* ProbabilityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbabilityIndicator.swift; sourceTree = "<group>"; };
 		6CB80F3A26066935008B5376 /* ThreatDirections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreatDirections.swift; sourceTree = "<group>"; };
-		6CC0C19025FC3FC30006464D /* GS+input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GS+input.swift"; sourceTree = "<group>"; };
+		6CB80F3E2606B463008B5376 /* MainHUD.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MainHUD.sks; sourceTree = "<group>"; };
+		6CB80F432606B7B0008B5376 /* MainHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHUD.swift; sourceTree = "<group>"; };
+		6CB80F472606D563008B5376 /* SpriteKitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKitButton.swift; sourceTree = "<group>"; };
+		6CB80F4B2606D604008B5376 /* LabelButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelButton.swift; sourceTree = "<group>"; };
+		6CB80F5426078E0D008B5376 /* HelloButton.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = HelloButton.sks; sourceTree = "<group>"; };
+		6CB80F572607B32F008B5376 /* TurnPanel.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = TurnPanel.sks; sourceTree = "<group>"; };
+		6CB80F5A2607C4AE008B5376 /* TurnPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnPanel.swift; sourceTree = "<group>"; };
+		6CB80F5D26081962008B5376 /* PlayerShipHealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerShipHealth.swift; sourceTree = "<group>"; };
+		6CC0C19025FC3FC30006464D /* GS+touches.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GS+touches.swift"; sourceTree = "<group>"; };
 		6CC0C19825FD247C0006464D /* Board+movement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Board+movement.swift"; sourceTree = "<group>"; };
 		6CC0C1A825FD89D70006464D /* gamescenes.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = gamescenes.scnassets; sourceTree = "<group>"; };
 		6CC0C1AC25FD8A210006464D /* boardCell.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = boardCell.scnassets; sourceTree = "<group>"; };
@@ -96,6 +112,7 @@
 		6C43149D25F8FF7E00092D54 /* objects */ = {
 			isa = PBXGroup;
 			children = (
+				6CB80F412606B78F008B5376 /* overlays */,
 				6C60EB3625EC166C00A9157D /* gameScene */,
 				6C6198A225F1C009008F2794 /* board */,
 				6C4DD4662600D74400832788 /* boardCell */,
@@ -123,6 +140,7 @@
 				6CC0C1AC25FD8A210006464D /* boardCell.scnassets */,
 				6C60EB2125EBEFBF00A9157D /* art.scnassets */,
 				6C60EB2825EBEFC200A9157D /* Assets.xcassets */,
+				6CB80F5426078E0D008B5376 /* HelloButton.sks */,
 			);
 			path = art;
 			sourceTree = "<group>";
@@ -130,6 +148,7 @@
 		6C5CC67A25EDD07900BEEC7C /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				6CB80F4A2606D5FD008B5376 /* buttons */,
 				6CB80F3A26066935008B5376 /* ThreatDirections.swift */,
 				6C8364EF25F6F00200A6E4AD /* Constants.swift */,
 				6C849DB925F06C1000232846 /* SceneKitUtils.swift */,
@@ -177,7 +196,7 @@
 			children = (
 				6C60EB2325EBEFBF00A9157D /* GameViewController.swift */,
 				6C60EB3725EC16A200A9157D /* GS+Creators.swift */,
-				6CC0C19025FC3FC30006464D /* GS+input.swift */,
+				6CC0C19025FC3FC30006464D /* GS+touches.swift */,
 			);
 			path = gameScene;
 			sourceTree = "<group>";
@@ -203,6 +222,35 @@
 				6C8364F425F70EEE00A6E4AD /* PlayerShip.swift */,
 			);
 			path = player;
+			sourceTree = "<group>";
+		};
+		6CB80F412606B78F008B5376 /* overlays */ = {
+			isa = PBXGroup;
+			children = (
+				6CB80F422606B799008B5376 /* mainHUD */,
+			);
+			path = overlays;
+			sourceTree = "<group>";
+		};
+		6CB80F422606B799008B5376 /* mainHUD */ = {
+			isa = PBXGroup;
+			children = (
+				6CB80F3E2606B463008B5376 /* MainHUD.sks */,
+				6CB80F432606B7B0008B5376 /* MainHUD.swift */,
+				6CB80F572607B32F008B5376 /* TurnPanel.sks */,
+				6CB80F5A2607C4AE008B5376 /* TurnPanel.swift */,
+				6CB80F5D26081962008B5376 /* PlayerShipHealth.swift */,
+			);
+			path = mainHUD;
+			sourceTree = "<group>";
+		};
+		6CB80F4A2606D5FD008B5376 /* buttons */ = {
+			isa = PBXGroup;
+			children = (
+				6CB80F4B2606D604008B5376 /* LabelButton.swift */,
+				6CB80F472606D563008B5376 /* SpriteKitButton.swift */,
+			);
+			path = buttons;
 			sourceTree = "<group>";
 		};
 		6CD84D6F25EC657B00F2F412 /* extensions */ = {
@@ -280,7 +328,10 @@
 			files = (
 				6CC0C1A925FD89D70006464D /* gamescenes.scnassets in Resources */,
 				6C60EB2225EBEFBF00A9157D /* art.scnassets in Resources */,
+				6CB80F3F2606B463008B5376 /* MainHUD.sks in Resources */,
 				6C60EB2925EBEFC200A9157D /* Assets.xcassets in Resources */,
+				6CB80F5526078E0D008B5376 /* HelloButton.sks in Resources */,
+				6CB80F582607B32F008B5376 /* TurnPanel.sks in Resources */,
 				6CC0C1AD25FD8A210006464D /* boardCell.scnassets in Resources */,
 				6C60EB2725EBEFBF00A9157D /* Main.storyboard in Resources */,
 			);
@@ -299,21 +350,26 @@
 				6CB80F38260633ED008B5376 /* ProbabilityIndicator.swift in Sources */,
 				6CD84D6D25EC2B2E00F2F412 /* Board.swift in Sources */,
 				6C60EB2425EBEFBF00A9157D /* GameViewController.swift in Sources */,
+				6CB80F442606B7B0008B5376 /* MainHUD.swift in Sources */,
+				6CB80F482606D563008B5376 /* SpriteKitButton.swift in Sources */,
 				6C61989C25F1B275008F2794 /* AppUtils.swift in Sources */,
 				6C8364F025F6F00200A6E4AD /* Constants.swift in Sources */,
 				6C5CC67C25EDD0D100BEEC7C /* MUtils.swift in Sources */,
-				6CC0C19125FC3FC30006464D /* GS+input.swift in Sources */,
+				6CC0C19125FC3FC30006464D /* GS+touches.swift in Sources */,
 				6C16970E25F5974A00596637 /* Board+structs.swift in Sources */,
 				6C4DD45F26002C9500832788 /* BoardCell+cellProbabilityDelegate.swift in Sources */,
 				6C39ED6E25F9A1CB005BF5C2 /* SCNNode+ext.swift in Sources */,
 				6C16970A25F5971300596637 /* Board+tests.swift in Sources */,
+				6CB80F5E26081962008B5376 /* PlayerShipHealth.swift in Sources */,
 				6C16971225F59C2600596637 /* Board+positioning.swift in Sources */,
 				6C60EB2025EBEFBF00A9157D /* AppDelegate.swift in Sources */,
+				6CB80F5B2607C4AE008B5376 /* TurnPanel.swift in Sources */,
 				6C16970325F5678A00596637 /* Board+helpers.swift in Sources */,
 				6C5CC68025EDD5F000BEEC7C /* BoardCell.swift in Sources */,
 				6C4DD462260033DE00832788 /* Board+boardCellDelegate.swift in Sources */,
 				6CB80F3B26066935008B5376 /* ThreatDirections.swift in Sources */,
 				6C849DBA25F06C1000232846 /* SceneKitUtils.swift in Sources */,
+				6CB80F4C2606D604008B5376 /* LabelButton.swift in Sources */,
 				6C43149A25F8F8B900092D54 /* TargetShip.swift in Sources */,
 				6C8364F525F70EEE00A6E4AD /* PlayerShip.swift in Sources */,
 				6C1696D325F2FC3900596637 /* UIColor+ext.swift in Sources */,

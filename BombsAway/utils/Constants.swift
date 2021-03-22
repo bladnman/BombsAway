@@ -19,6 +19,7 @@ typealias C_MOVE = Constants.Movement
 typealias C_CELL_MODE = Constants.Cell.Modes
 typealias C_COLOR = Constants.Colors
 typealias C_BOARD = Constants.Board
+typealias C_PLAYER = Constants.Player
 typealias C_DBG = Constants.Debug
 
 struct Constants {
@@ -80,6 +81,9 @@ struct Constants {
       static let radius = 3
     }
   }
+  struct Player {
+    static let startingHealth = 3
+  }
   struct Movement {
     struct Player {
       static let initialStepsPerMove = 2
@@ -105,7 +109,7 @@ struct Constants {
     static let greenLight = UIColor.fromHex("#badc58")
     static let green = UIColor.fromHex("#6ab04c")
     static let lightBlueLight = UIColor.fromHex("#7ed6df")
-    static let lightBlue = UIColor.fromHex("#22a6b3")
+    static let lightBlue = UIColor.fromHex("#d4d7d8")
 //    static let blueLight = UIColor.fromHex("#686de0")
 //    static let blue = UIColor.fromHex("#4834d4")
   }
