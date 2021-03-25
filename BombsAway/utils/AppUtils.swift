@@ -11,6 +11,10 @@ import SpriteKit
 enum TouchPhase {
   case start, end
 }
+enum GameActionType {
+  case none, shoot, probe, move
+}
+
 
 // https://flatuicolors.com/palette/defo
 let shipColors:[String] = [
@@ -54,14 +58,12 @@ struct Models {
   static let cellFloor: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/Floor.scn", nodeName: C_OBJ_NAME.cellFloor)!
   static let selectableIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/SelectableIndicator.scn", nodeName: "node")!
   static let cellProbe: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/Probe.scn", nodeName: "node")!
-  static let playerShip: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/PlayerShip.scn", nodeName: "node")!
-  static let _probabilityIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/ProbabilityIndicator.scn", nodeName: "node")!
+  static let attackShip: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/AttackShip.scn", nodeName: "node")!
+  static let _probabilityIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/ProbabilityIndicator.scn", nodeName: "base")!
+  static let _missIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/MissIndicator.scn", nodeName: "base")!
   
-  static var probabilityIndicator: ProbabilityIndicator {
-    get {
-      return ProbabilityIndicator(deepCopyNode(_probabilityIndicator))
-    }
-  }
+  static var probabilityIndicator: ProbabilityIndicator { ProbabilityIndicator(ScnUtils.deepCopyNode(_probabilityIndicator)) }
+  static var missIndicator: SCNNode { ScnUtils.deepCopyNode(_missIndicator) }
 }
 func loadNodeFromSCNScene(sceneName: String, nodeName: String) -> SCNNode? {
   if let scene = SCNScene(named: sceneName) {

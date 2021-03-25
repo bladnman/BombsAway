@@ -40,15 +40,15 @@ class ProbabilityIndicator: SCNNode {
   init(_ baseNode:SCNNode) {
     self.baseNode = baseNode
 
-    self.nNode = getChildWithName(baseNode.childNodes, name: "n")!
-    self.eNode = getChildWithName(baseNode.childNodes, name: "e")!
-    self.sNode = getChildWithName(baseNode.childNodes, name: "s")!
-    self.wNode = getChildWithName(baseNode.childNodes, name: "w")!
-    self.neNode = getChildWithName(baseNode.childNodes, name: "ne")!
-    self.seNode = getChildWithName(baseNode.childNodes, name: "se")!
-    self.swNode = getChildWithName(baseNode.childNodes, name: "sw")!
-    self.nwNode = getChildWithName(baseNode.childNodes, name: "nw")!
-    self.centerNode = getChildWithName(baseNode.childNodes, name: "center")!
+    self.nNode = ScnUtils.getChildWithName(baseNode.childNodes, name: "n")!
+    self.eNode = ScnUtils.getChildWithName(baseNode.childNodes, name: "e")!
+    self.sNode = ScnUtils.getChildWithName(baseNode.childNodes, name: "s")!
+    self.wNode = ScnUtils.getChildWithName(baseNode.childNodes, name: "w")!
+    self.neNode = ScnUtils.getChildWithName(baseNode.childNodes, name: "ne")!
+    self.seNode = ScnUtils.getChildWithName(baseNode.childNodes, name: "se")!
+    self.swNode = ScnUtils.getChildWithName(baseNode.childNodes, name: "sw")!
+    self.nwNode = ScnUtils.getChildWithName(baseNode.childNodes, name: "nw")!
+    self.centerNode = ScnUtils.getChildWithName(baseNode.childNodes, name: "center")!
     
     
     super.init()

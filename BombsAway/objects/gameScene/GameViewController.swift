@@ -14,10 +14,13 @@ class GameViewController: UIViewController {
   
   var scene: SCNScene!
   var sceneView: SCNView!
-  var attackBoard: Board!
+  var offenseBoard: Board!
   var defendBoard: Board!
   var player: SCNNode!
   var gameHUD: MainHUD?
+  var nextAction: GameAction?
+  var player1 = Player()
+  var player2 = Player()
   
   // CAMERA
   var camera: SCNNode!
@@ -28,19 +31,15 @@ class GameViewController: UIViewController {
     super.viewDidLoad()
     initializeGame()
   }
-
   func initializeGame() {
     createNewScene()
   }
-  
   override var shouldAutorotate: Bool {
     return true
   }
-    
   override var prefersStatusBarHidden: Bool {
     return true
   }
-    
   override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
     if UIDevice.current.userInterfaceIdiom == .phone {
       return .allButUpsideDown
@@ -50,13 +49,25 @@ class GameViewController: UIViewController {
   }
 }
 
+
 // MARK: OVERLAY DELEGATE
-extension GameViewController: OverlayProtocol {
-  func overlayHandledTouchStart() {
-//    print("[M@] we heard you started")
+extension GameViewController: MainHUDProtocol {
+  func mainHUDMovePressed() {
+    nextAction = GameAction(.move)
+    offenseBoard.mode = .move
   }
-  
-  func overlayHandledTouchEnd() {
-//    print("[M@] we heard you ended")
+  func mainHUDProbePressed() {
+    nextAction = GameAction(.probe)
+    offenseBoard.mode = .probe
+  }
+  func mainHUDShootPressed() {
+    nextAction = GameAction(.shoot)
+    offenseBoard.mode = .shoot
+  }
+  func mainHUDHandledTouchStart() {
+    // noop
+  }
+  func mainHUDHandledTouchEnd() {
+    // noop
   }
 }

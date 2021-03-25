@@ -7,7 +7,7 @@
 
 import SceneKit
 
-class PlayerShip: SCNNode {
+class AttackShip: SCNNode {
   let NAME = C_OBJ_NAME.player
   var stepSize: Int = C_MOVE.Player.initialStepsPerMove
   var gridPoint: GridPoint {
@@ -26,7 +26,7 @@ class PlayerShip: SCNNode {
 //    boxGeometry.firstMaterial?.emission.intensity = 0.8
 //    self.geometry = boxGeometry
     
-    self.addChildNode(Models.playerShip.clone())
+    self.addChildNode(Models.attackShip.clone())
   }
     
   required init?(coder: NSCoder) {

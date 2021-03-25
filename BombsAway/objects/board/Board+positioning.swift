@@ -41,7 +41,7 @@ extension Board {
     ship.runAction(seqAction)
     
     // add ship to board
-    if isOwn {
+    if type == .defense {
       ship.geometry?.firstMaterial?.transparency = 0.7
       boardGeom.addChildNode(ship)
     }

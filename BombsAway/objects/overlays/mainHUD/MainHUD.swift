@@ -6,15 +6,15 @@
 //
 
 import SpriteKit
-protocol OverlayProtocol {
-  func overlayHandledTouchStart()
-  func overlayHandledTouchEnd()
+protocol MainHUDProtocol {
+  func mainHUDHandledTouchStart()
+  func mainHUDHandledTouchEnd()
+  func mainHUDMovePressed()
+  func mainHUDProbePressed()
+  func mainHUDShootPressed()
 }
 class MainHUD: SKScene {
-
-  
-
-  var overlayDelegate: OverlayProtocol?
+  var hudDelegate: MainHUDProtocol?
   var redBox: SKNode!
   var isHandlingTouch = false {
     didSet {
@@ -22,36 +22,25 @@ class MainHUD: SKScene {
       // or when we were not handling touches to begin with
       if isHandlingTouch {
         if !oldValue {
-          overlayDelegate?.overlayHandledTouchStart()
+          hudDelegate?.mainHUDHandledTouchStart()
         }
       } else {
         if oldValue {
-          overlayDelegate?.overlayHandledTouchEnd()
+          hudDelegate?.mainHUDHandledTouchEnd()
         }
       }
     }
   }
   
-  
   // MARK: MAIN FOR NOW
-  convenience init(size:CGSize, overlayDelegate:OverlayProtocol) {
+  convenience init(size:CGSize, delegate:MainHUDProtocol) {
     self.init(size: size)
     self.isUserInteractionEnabled = true
-    self.overlayDelegate = overlayDelegate
+    self.hudDelegate = delegate
     setup()
   }
   func setup() {
-    redBox = SKSpriteNode(color: UIColor.red, size: CGSize(width: 200, height: 100))
-    self.addChild(redBox)
-    redBox.position = CGPoint(x: size.width/2, y: size.height/1.5)
-    
-    let btn = LabelButton(text: "Morning World", size: CGSize(width: 150, height: 75), action: handleButtonPress, index: 1)
-    self.addChild(btn)
-    btn.position = CGPoint(x: size.width/2, y: size.height/3)
-    btn.onUp = handleButtonUp
-    btn.onDown = handleButtonDown
-    
-    addTurnPanels()
+    addGameActionPanelGroup()
     addPlayerHealth()
   }
   func addPlayerHealth() {
@@ -61,56 +50,14 @@ class MainHUD: SKScene {
     let hHeight = health.frame.size.height
     health.position = CGPoint(x: size.width - 50.0 - hWidth/2, y: 50.0 + hHeight/2)
   }
-  func addTurnPanels() {
-    let allPanelsNode = SKNode();
-    var panelHeight: CGFloat = 0.0
-    for i in 0...2 {
-      print("[M@] [\(i)]")
-      let turnPanel = TurnPanel(delegate: self)
-      turnPanel.position = CGPoint(x: (CGFloat(i) * turnPanel.frame.size.width) - CGFloat(i) * 10.0, y: 0.0)
-      allPanelsNode.addChild(turnPanel)
-      
-      panelHeight = turnPanel.frame.size.height
-    }
+  func addGameActionPanelGroup() {
+    let allPanelsNode = GameActionPanelGroup(delegate: self);
     let x:CGFloat = (CGFloat(size.width) * 0.5)
-    let y:CGFloat = panelHeight/2 + 20.0
+    let y:CGFloat = allPanelsNode.frame.size.height/2 + 20.0
     allPanelsNode.position = CGPoint(x: x, y: y)
     addChild(allPanelsNode)
     allPanelsNode.setScale(0.7)
   }
-
-  func handleButtonPress(buttonIndex: Int) {
-    print("[M@] [\(buttonIndex)] was pressed")
-    isHandlingTouch = false
-  }
-  func handleButtonUp(buttonIndex: Int) {
-    print("[M@] [\(buttonIndex)] was pushed up")
-    isHandlingTouch = true
-  }
-  func handleButtonDown(buttonIndex: Int) {
-    print("[M@] [\(buttonIndex)] was pushed down")
-    isHandlingTouch = true
-  }
-  
-  
-  
-  
-  // MARK: RUNAWAY THREAD
-  // hold on to this code
-  // some odd runaway thread happening here
-  //
-//  convenience init(overlayDelegate: OverlayProtocol) {
-//    self.init()
-//    self.overlayDelegate = overlayDelegate
-//  }
-//  override convenience init() {
-//    self.init(fileNamed: "MainHUD")!
-//    self.isUserInteractionEnabled = true
-//
-//    if let redBox = childNode(withName: "RED_BOX") {
-//      self.redBox = redBox
-//    }
-//  }
 }
 
 extension MainHUD {
@@ -134,25 +81,22 @@ extension MainHUD {
     handleTouches(touches, for: .end)
   }
 }
-
-extension MainHUD: TurnPanelDelegate {
-  // MARK: TURN PANEL DELEGATE
-  func turnPanelMovePressed(_ panel: TurnPanel) {
-    print("[M@] handleMovePress")
-    panel.mode = .move
+extension MainHUD: GameActionPanelGroupDelegate {
+  // MARK: GAME ACTION PANEL GROUP DELEGATE
+  func gameActionPanelGroupMovePressed() {
+    hudDelegate?.mainHUDMovePressed()
   }
-  func turnPanelProbePressed(_ panel: TurnPanel) {
-    print("[M@] handleProbePress")
-    panel.mode = .probe
+  func gameActionPanelGroupProbePressed() {
+    hudDelegate?.mainHUDProbePressed()
   }
-  func turnPanelShootPressed(_ panel: TurnPanel) {
-    print("[M@] handleShootPress")
-    panel.mode = .shoot
+  func gameActionPanelGroupShootPressed() {
+    hudDelegate?.mainHUDShootPressed()
   }
-  func turnPanelHandledTouchStart(_ panel: TurnPanel) {
+  
+  func gameActionPanelGroupHandledTouchStart() {
     isHandlingTouch = true
   }
-  func turnPanelHandledTouchEnd(_ panel: TurnPanel) {
+  func gameActionPanelGroupHandledTouchEnd() {
     isHandlingTouch = false
   }
 }

@@ -84,7 +84,7 @@ extension GameViewController {
 //    scene.rootNode.addChildNode(ambientLightNode)
   }
   func createBoard() {
-    if let oldBoard = self.attackBoard {
+    if let oldBoard = self.offenseBoard {
       oldBoard.removeAllActions()
       oldBoard.removeFromParentNode()
     }
@@ -93,27 +93,36 @@ extension GameViewController {
       oldBoard.removeFromParentNode()
     }
 
-    // ATTACK BOARD
-    attackBoard = Board(sceneView: sceneView, columns: C_BOARD.Size.columns, rows: C_BOARD.Size.rows, isOwn: false)
-    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "backBoardNode" }) {
-      attackBoard.position = SCNVector3(-0.5, 0, -0.5)
-      attackBoard.name = C_OBJ_NAME.attackBoard
-      holderNode.addChildNode(attackBoard)
-    }
+    // OFFENSE BOARD
+    offenseBoard = Board(sceneView: sceneView,
+                        columns: C_BOARD.Size.columns,
+                        rows: C_BOARD.Size.rows,
+                        type: BoardType.defense)
     
     // DEFEND BOARD
-    defendBoard = Board(sceneView: sceneView, columns: 10, rows: 10, isOwn: true)
-    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "bottomBoardNode" }) {
-      defendBoard.position = SCNVector3(-0.5, 0, -0.5)
-      defendBoard.name = C_OBJ_NAME.defendBoard
-      holderNode.addChildNode(defendBoard)
+//    defendBoard = Board(sceneView: sceneView,
+//                        columns: C_BOARD.Size.columns,
+//                        rows: C_BOARD.Size.rows,
+//                        type: BoardType.offense)
+
+    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "backBoardNode" }) {
+      offenseBoard.position = SCNVector3(-0.5, 0, -0.5)
+      offenseBoard.name = C_OBJ_NAME.attackBoard
+      holderNode.addChildNode(offenseBoard)
     }
+    
+
+//    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "bottomBoardNode" }) {
+//      defendBoard.position = SCNVector3(-0.5, 0, -0.5)
+//      defendBoard.name = C_OBJ_NAME.defendBoard
+//      holderNode.addChildNode(defendBoard)
+//    }
   }
   func removeAllShips() {
     createBoard()
   }
   func createHUD() {
-    gameHUD = MainHUD(size: view.frame.size, overlayDelegate: self)
+    gameHUD = MainHUD(size: view.frame.size, delegate: self)
     sceneView.overlaySKScene = gameHUD
   }
 }

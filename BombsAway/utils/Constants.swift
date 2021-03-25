@@ -16,11 +16,15 @@ typealias C_PHY_CAT = Constants.Physics.Categories
 typealias C_ZPOS = Constants.ZPositions
 typealias C_ANIS = Constants.Anis
 typealias C_MOVE = Constants.Movement
+typealias C_CELL = Constants.Cell
 typealias C_CELL_MODE = Constants.Cell.Modes
 typealias C_COLOR = Constants.Colors
 typealias C_BOARD = Constants.Board
 typealias C_PLAYER = Constants.Player
 typealias C_DBG = Constants.Debug
+
+
+
 
 struct Constants {
   struct Debug {
@@ -44,6 +48,7 @@ struct Constants {
     }
   }
   struct Cell {
+    static let SELECTABLE_MODES = [GameActionType.move, GameActionType.probe, GameActionType.shoot]
     enum Modes {
       case none
       case move
@@ -83,10 +88,11 @@ struct Constants {
   }
   struct Player {
     static let startingHealth = 3
+    static let startingActionsPerTurn = 9
   }
   struct Movement {
     struct Player {
-      static let initialStepsPerMove = 2
+      static let initialStepsPerMove = 5
       static let perCellSec = 0.05
       static let perCellPauseSec = 0.01
     }

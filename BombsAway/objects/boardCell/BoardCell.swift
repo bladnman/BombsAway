@@ -10,6 +10,7 @@ protocol BoardCellDelegate {
   func bcellGetSurroundingProbeCount(_ gp: GridPoint) -> Int
   func bcellGetSurroundingThreats(_ gp: GridPoint) -> ThreatDirections
 }
+
 class BoardCell: SCNNode {
   
   let NAME: String = C_OBJ_NAME.boardCell
@@ -17,7 +18,7 @@ class BoardCell: SCNNode {
   var delegate: BoardCellDelegate?
   // data
   let gridPoint: GridPoint!
-  var mode = C_CELL_MODE.none { didSet { update() } }
+  var mode = GameActionType.none { didSet { update() } }
   
   // MARK: CELL ELEMENTS
   // only one of:
@@ -41,6 +42,7 @@ class BoardCell: SCNNode {
   var spawnAreaIndicator: SCNNode?
   var selectableIndicator: SCNNode!
   var probabilityIndicator: ProbabilityIndicator?
+  var missIndicator: SCNNode?
   
   
   var floorColor: UIColor {
@@ -53,6 +55,7 @@ class BoardCell: SCNNode {
   var isSpawnRegion: Bool = false { didSet { update() } }
   var isLabelVisible: Bool = false { didSet { update() } }
   var isHighlighted: Bool = false { didSet { update() } }
+  var isMiss: Bool = false { didSet { update() } }
   
   var hasSolidShip: Bool { return targetShipRef?.isSolidAt(gridPoint) ?? false }
   var hasAnyShip: Bool { return targetShipRef != nil }
@@ -84,16 +87,16 @@ class BoardCell: SCNNode {
   }
   
   func installBaseScene() {
-    baseNode = deepCopyNode(Models.boardCell)
+    baseNode = ScnUtils.deepCopyNode(Models.boardCell)
     addChildNode(baseNode)
     
-    floor = getChildWithName(baseNode.childNodes, name: C_OBJ_NAME.cellFloor)
+    floor = ScnUtils.getChildWithName(baseNode.childNodes, name: C_OBJ_NAME.cellFloor)
 
-    selectableIndicator = deepCopyNode(Models.selectableIndicator)
+    selectableIndicator = ScnUtils.deepCopyNode(Models.selectableIndicator)
     selectableIndicator.opacity = 0.0
     addChildNode(selectableIndicator)
     
-    selectableIndicator = deepCopyNode(Models.selectableIndicator)
+    selectableIndicator = ScnUtils.deepCopyNode(Models.selectableIndicator)
     selectableIndicator.opacity = 0.0
     addChildNode(selectableIndicator)
     
@@ -106,22 +109,31 @@ class BoardCell: SCNNode {
     updateFloor()
     updateLabel()
     updateHitNode()
-//    updateSelectableIndicator()
+    updateSelectableIndicator()
+    updateMissIndicator()
   }
   func updateFloor() {
     floor?.geometry?.firstMaterial?.diffuse.contents = floorColor
   }
+  func getFloorColor() -> UIColor {
+    switch mode {
+    case .move:
+      return C_COLOR.lightBlue
+    default:
+      return UIColor.fromHex("#34495e")
+    }
+  }
   
   // MARK: SELECTION INDICATOR
   func updateSelectableIndicator() {
-    if mode == .move {
+    switch mode {
+    case .move, .probe, .shoot:
       showSelectableIndicator()
-    } else {
+    default:
       hideSelectableIndicator()
     }
   }
   func showSelectableIndicator(_ duration: Double = C_MOVE.BoardCell.SelectIndicator.fadeInSec) {
-    
     selectableIndicator.removeAction(forKey: "fadeIn")
     selectableIndicator.removeAction(forKey: "fadeOut")
 
@@ -143,7 +155,7 @@ class BoardCell: SCNNode {
     // SHOW
     if isLabelVisible {
       if gpLabel == nil {
-        gpLabel = makeText(text: gridPoint.toString(),
+        gpLabel = ScnUtils.makeText(text: gridPoint.toString(),
                           depthOfText: 3.0,
                           color: UIColor.fromHex("#95a5a6"),
                           transparency: 1.0)
@@ -254,5 +266,29 @@ class BoardCell: SCNNode {
     guard probabilityIndicator != nil else { return }
     probabilityIndicator?.removeFromParentNode()
     probabilityIndicator = nil
+  }
+  
+  
+  // MARK: MISS INDICATOR
+  func updateMissIndicator() {
+    if isMiss {
+      showMissIndicator()
+    } else {
+      hideMissIndicator()
+    }
+  }
+  func showMissIndicator() {
+    // already showing - bail
+    guard missIndicator == nil else { return }
+    missIndicator = Models.missIndicator
+
+    addChildNode(missIndicator!)
+  }
+  func hideMissIndicator() {
+    // not showing - bail
+    guard missIndicator != nil else { return }
+    missIndicator?.removeFromParentNode()
+    missIndicator = nil
+
   }
 }

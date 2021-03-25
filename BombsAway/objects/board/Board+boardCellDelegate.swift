@@ -44,7 +44,7 @@ extension Board: BoardCellDelegate {
     let ringCells = cellListForRing(gp, radius: 1)
     ringCells.forEach { cell in
       if cell.hasProbe { probeCount += 1 }
-      if cell.gridPoint == player.gridPoint { probeCount += 1 }
+      if cell.gridPoint == attackShip.gridPoint { probeCount += 1 }
     }
     return probeCount
   }

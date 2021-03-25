@@ -36,7 +36,7 @@ extension Board {
     return cells
   }
   func cellListFor(_ centerGP: GridPoint, radius: Int = 0) -> [BoardCell] {
-    return cellListFor(BoardRange(columnRange: centerGP.column...centerGP.column, rowRange: centerGP.row...centerGP.row))
+    return cellListFor(BoardRange(columnRange: centerGP.column-radius...centerGP.column+radius, rowRange: centerGP.row-radius...centerGP.row+radius))
   }
   func cellListForRing(_ centerGP: GridPoint, radius: Int) -> [BoardCell] {
     let colMin = max(1, centerGP.column - radius)
@@ -151,7 +151,7 @@ extension Board {
     }
     
     var outCellList = [BoardCell]()
-    if let cell = cellFor(player.gridPoint.column, player.gridPoint.row) {
+    if let cell = cellFor(attackShip.gridPoint.column, attackShip.gridPoint.row) {
       outCellList.append(cell)
     }
     
@@ -177,7 +177,7 @@ extension Board {
     }
     
     var outCellList = [BoardCell]()
-    if let cell = cellFor(player.gridPoint.column, player.gridPoint.row) {
+    if let cell = cellFor(attackShip.gridPoint.column, attackShip.gridPoint.row) {
       outCellList.append(cell)
     }
     
@@ -328,7 +328,7 @@ extension Board {
   }
   func isValidMove(_ gp: GridPoint) -> Bool {
     return isValid(gp) &&
-      (player.gridPoint.isDiagonalTo(gp) || player.gridPoint.isStraightTo(gp))
+      (attackShip.gridPoint.isDiagonalTo(gp) || attackShip.gridPoint.isStraightTo(gp))
   }
   func isClearForShipPlacement(_ gp: GridPoint) -> Bool {
     return cellFor(gp)?.isClearForShipPlacement ?? false

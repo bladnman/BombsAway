@@ -10,7 +10,7 @@ import SceneKit
 extension SCNNode {
   func showPivotIndicator() {
     removePivotIndicator()
-    createPivotIndicator(self)
+    ScnUtils.createPivotIndicator(self)
   }
 
   func removePivotIndicator() {

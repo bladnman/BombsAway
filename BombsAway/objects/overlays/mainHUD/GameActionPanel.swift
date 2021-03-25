@@ -9,41 +9,34 @@ import SpriteKit
 
 let iconPadding:CGFloat = 20.0
 
-enum TurnMode {
-  case untaken, shoot, probe, move
-}
-protocol TurnPanelDelegate {
-  func turnPanelHandledTouchStart(_ panel: TurnPanel)
-  func turnPanelHandledTouchEnd(_ panel: TurnPanel)
+protocol GameActionPanelDelegate {
+  func gameActionPanelHandledTouchStart(_ panel: GameActionPanel)
+  func gameActionPanelHandledTouchEnd(_ panel: GameActionPanel)
   
-  func turnPanelMovePressed(_ panel: TurnPanel)
-  func turnPanelProbePressed(_ panel: TurnPanel)
-  func turnPanelShootPressed(_ panel: TurnPanel)
+  func gameActionPanelMovePressed(_ panel: GameActionPanel)
+  func gameActionPanelProbePressed(_ panel: GameActionPanel)
+  func gameActionPanelShootPressed(_ panel: GameActionPanel)
 }
-class TurnPanel: SKNode {
+class GameActionPanel: SKNode {
   
   let background: SKShapeNode!
   let moveIcon: SKSpriteNode!
   let probeIcon: SKSpriteNode!
   let shootIcon: SKSpriteNode!
-  var delegate: TurnPanelDelegate?
+  var delegate: GameActionPanelDelegate?
   
-  var onMovePressed: (() -> Void)?
-  var onProbePressed: (() -> Void)?
-  var onShootPressed: (() -> Void)?
-  
-  var mode: TurnMode = .untaken { didSet { update() }}
+  var actionType: GameActionType = .none { didSet { update() }}
   var isHandlingTouch = false {
     didSet {
       // trying to not message twice
       // or when we were not handling touches to begin with
       if isHandlingTouch {
         if !oldValue {
-          delegate?.turnPanelHandledTouchStart(self)
+          delegate?.gameActionPanelHandledTouchStart(self)
         }
       } else {
         if oldValue {
-          delegate?.turnPanelHandledTouchEnd(self)
+          delegate?.gameActionPanelHandledTouchEnd(self)
         }
       }
     }
@@ -53,7 +46,7 @@ class TurnPanel: SKNode {
   var halfSize: CGFloat { fullSize/2 }
   override var frame: CGRect { background.frame }
 
-  convenience init(delegate: TurnPanelDelegate) {
+  convenience init(delegate: GameActionPanelDelegate) {
     self.init()
     self.delegate = delegate
   }
@@ -73,7 +66,6 @@ class TurnPanel: SKNode {
     background.lineWidth = 3.0
     background.position = CGPoint(x: -1*size.width/2, y: -1*size.height/2)
 
-    
     super.init()
     self.isUserInteractionEnabled = true
     
@@ -84,8 +76,8 @@ class TurnPanel: SKNode {
     update()
   }
   func update() {
-    switch mode {
-    case .untaken:
+    switch actionType {
+    case .none:
       setUntakenLayout()
     default:
       setTakenLayout()
@@ -110,7 +102,7 @@ class TurnPanel: SKNode {
     shootIcon.alpha = 0.0
     
     var icon = moveIcon
-    switch mode {
+    switch actionType {
     case .move: icon = moveIcon
     case .probe: icon = probeIcon
     case .shoot: icon = shootIcon
@@ -130,20 +122,17 @@ class TurnPanel: SKNode {
   // MARK: TOUCHES
   func handleTouches(_ touches: Set<UITouch>, for touchPhase: TouchPhase) {
     // for ENDING touches (and only when untaken)
-    if touchPhase == .end && mode == .untaken {
+    if touchPhase == .end && actionType == .none {
       for touch: AnyObject in touches {
         let location = touch.location(in: self)
         if moveIcon == self.atPoint(location) {
-          delegate?.turnPanelMovePressed(self)
-          onMovePressed?()
+          delegate?.gameActionPanelMovePressed(self)
         }
         else if probeIcon == self.atPoint(location) {
-          delegate?.turnPanelProbePressed(self)
-          onProbePressed?()
+          delegate?.gameActionPanelProbePressed(self)
         }
         else if shootIcon == self.atPoint(location) {
-          delegate?.turnPanelShootPressed(self)
-          onShootPressed?()
+          delegate?.gameActionPanelShootPressed(self)
         }
       }
     }

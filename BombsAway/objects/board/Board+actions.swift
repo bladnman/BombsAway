@@ -11,9 +11,9 @@ extension Board {
     // invalid move - bail
     guard isValidMove(gp) else { return }
     
-    var stepCellList = cellListForJourney(startGP: player.gridPoint, endGP: gp)
+    var stepCellList = cellListForJourney(startGP: attackShip.gridPoint, endGP: gp)
     
-    // first cell is where the playerShip is now
+    // first cell is where the attackShip is now
     stepCellList.removeFirst()
     
     if let stepCell = stepCellList.first {
@@ -28,8 +28,8 @@ extension Board {
           let moveAction = SCNAction.move(to: positionForGridPoint(nextStepGP), duration: C_MOVE.Player.perCellSec)
           let pauseAction = SCNAction.wait(duration: C_MOVE.Player.perCellPauseSec)
           
-          player.runAction(SCNAction.sequence([moveAction, pauseAction])) {
-            self.drawAvailableZone()
+          attackShip.runAction(SCNAction.sequence([moveAction, pauseAction])) {
+            self.update()
             
             // not there yet - keep steppin'!
             if nextStepGP != gp {
@@ -40,6 +40,16 @@ extension Board {
           }
         }
       }
+    }
+  }
+  func sendProbeTo(_ gp: GridPoint) {
+    if let cell = cellFor(gp) {
+      cell.hasProbe = true
+    }
+  }
+  func sendShotTo(_ gp: GridPoint) {
+    if let cell = cellFor(gp) {
+      cell.isMiss = true
     }
   }
 }

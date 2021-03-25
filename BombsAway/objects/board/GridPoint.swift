@@ -38,11 +38,7 @@ struct GridPoint {
     }
   }
   
-  static var zero: GridPoint {
-    get {
-      return GridPoint(0, 0)
-    }
-  }
+  static var zero: GridPoint { return GridPoint(0, 0) }
   
   func isDiagonalTo(_ gp: GridPoint) -> Bool {
     return (self.column - gp.column == self.row - gp.row) ||
