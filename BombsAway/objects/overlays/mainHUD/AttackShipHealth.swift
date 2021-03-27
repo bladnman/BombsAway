@@ -1,5 +1,5 @@
 //
-//  PlayerShipHealth.swift
+//  AttackShipHealth.swift
 //  BombsAway
 //
 //  Created by Maher, Matt on 3/21/21.
@@ -8,7 +8,7 @@
 import SpriteKit
 import Foundation
 
-class PlayerShipHealth: SKNode {
+class AttackShipHealth: SKNode {
   var maxHealth = C_PLAYER.startingHealth { didSet { update() } }
   var health = C_PLAYER.startingHealth { didSet { update() } }
   
@@ -33,11 +33,13 @@ class PlayerShipHealth: SKNode {
     addChild(bgNode)
     addChild(cropNode)
     
+    isUserInteractionEnabled = false
+    
     update()
   }
   func update() {
     let percentage = CGFloat(health) / CGFloat(maxHealth)
-    
+
     // move fill node "away" (off left)
     // for lower percentages
     let newX = -1 * (frame.size.width - frame.size.width * percentage)

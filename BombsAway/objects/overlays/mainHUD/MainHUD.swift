@@ -15,7 +15,8 @@ protocol MainHUDProtocol {
 }
 class MainHUD: SKScene {
   var hudDelegate: MainHUDProtocol?
-  var redBox: SKNode!
+  var nameLabel = SKLabelNode(fontNamed: "8BIT WONDER Nominal")
+  var healthNode = AttackShipHealth()
   var isHandlingTouch = false {
     didSet {
       // trying to not message twice
@@ -31,6 +32,7 @@ class MainHUD: SKScene {
       }
     }
   }
+  var player: Player? { didSet { update() }}
   
   // MARK: MAIN FOR NOW
   convenience init(size:CGSize, delegate:MainHUDProtocol) {
@@ -42,33 +44,56 @@ class MainHUD: SKScene {
   func setup() {
     addGameActionPanelGroup()
     addPlayerHealth()
+    addPlayerName()
+    
+    update()
+  }
+  func update() {
+    if let player = self.player {
+      // update player name
+      nameLabel.text = player.name
+      
+      // update health
+      healthNode.health = player.hitPoints
+      healthNode.maxHealth = player.hitPointsMax
+      
+    }
+    
+    
   }
   func addPlayerHealth() {
-    let health = PlayerShipHealth()
-    addChild(health)
-    let hWidth = health.frame.size.width
-    let hHeight = health.frame.size.height
-    health.position = CGPoint(x: size.width - 50.0 - hWidth/2, y: 50.0 + hHeight/2)
+    addChild(healthNode)
+    let hWidth = healthNode.frame.size.width
+    let hHeight = healthNode.frame.size.height
+    healthNode.position = CGPoint(x: size.width - 50.0 - hWidth/2, y: 50.0 + hHeight/2)
   }
   func addGameActionPanelGroup() {
     let allPanelsNode = GameActionPanelGroup(delegate: self);
-    let x:CGFloat = (CGFloat(size.width) * 0.5)
+    let x:CGFloat = frame.midX
     let y:CGFloat = allPanelsNode.frame.size.height/2 + 20.0
     allPanelsNode.position = CGPoint(x: x, y: y)
     addChild(allPanelsNode)
     allPanelsNode.setScale(0.7)
+  }
+  func addPlayerName() {
+    nameLabel.text = "player name"
+    nameLabel.fontSize = 15.0
+    addChild(nameLabel)
+    
+    let hHeight = healthNode.frame.size.height
+    nameLabel.position = CGPoint(x: healthNode.position.x, y: healthNode.position.y + hHeight)
   }
 }
 
 extension MainHUD {
   // MARK: TOUCHES
   func handleTouches(_ touches: Set<UITouch>, for touchPhase: TouchPhase) {
-    for touch: AnyObject in touches {
-      let location = touch.location(in: self)
-      if redBox == self.atPoint(location) {
-        print("redBox Touch event")
-      }
-    }
+//    for touch: AnyObject in touches {
+//      let location = touch.location(in: self)
+//      if redBox == self.atPoint(location) {
+//        print("redBox Touch event")
+//      }
+//    }
     isHandlingTouch = touchPhase == .start
   }
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

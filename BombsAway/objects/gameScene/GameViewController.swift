@@ -15,10 +15,11 @@ class GameViewController: UIViewController {
   var scene: SCNScene!
   var sceneView: SCNView!
   var offenseBoard: Board!
-  var defendBoard: Board!
+  var defenseBoard: Board!
   var player: SCNNode!
   var gameHUD: MainHUD?
   var nextAction: GameAction?
+  var currentTurn = GameTurn()
   var player1 = Player()
   var player2 = Player()
   
@@ -33,7 +34,16 @@ class GameViewController: UIViewController {
   }
   func initializeGame() {
     createNewScene()
+    startNewTurn()
   }
+  func startNewTurn() {
+    currentTurn = GameTurn()
+    currentTurn.board = offenseBoard
+  }
+  
+  
+  
+  
   override var shouldAutorotate: Bool {
     return true
   }
@@ -53,21 +63,40 @@ class GameViewController: UIViewController {
 // MARK: OVERLAY DELEGATE
 extension GameViewController: MainHUDProtocol {
   func mainHUDMovePressed() {
-    nextAction = GameAction(.move)
-    offenseBoard.mode = .move
+    currentTurn.nextActionType = .move
   }
   func mainHUDProbePressed() {
-    nextAction = GameAction(.probe)
-    offenseBoard.mode = .probe
+    currentTurn.nextActionType = .probe
   }
   func mainHUDShootPressed() {
-    nextAction = GameAction(.shoot)
-    offenseBoard.mode = .shoot
+    currentTurn.nextActionType = .shoot
   }
   func mainHUDHandledTouchStart() {
     // noop
   }
   func mainHUDHandledTouchEnd() {
+    // noop
+  }
+}
+
+
+// MARK: BOARD DELEGATE
+extension GameViewController: BoardProtocol {
+  func boardSubstantialChage(board: Board) {
+    // MARK: DEAD
+    if board.attacker.isDead {
+      currentTurn.isOver = true
+    }
+    
+    gameHUD?.update()
+  }
+}
+
+
+// MARK: SCENE UPDATE DELEGATE
+extension GameViewController: SCNSceneRendererDelegate {
+  
+  func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
     // noop
   }
 }

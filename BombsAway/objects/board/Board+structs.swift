@@ -37,6 +37,9 @@ struct BoardRange {
 
 extension BoardRange {
   init(_ gp: GridPoint, _ size: BoardSize) {
+//    assert(size.columns != 0, "BoardRange requires a non-zero value for columns and rows")
+//    assert(size.rows != 0, "BoardRange requires a non-zero value for columns and rows")
+
     let endCol = gp.column + (size.columns > 0 ? size.columns - 1 : size.columns + 1)
     let endRow = gp.row + (size.rows > 0 ? size.rows - 1 : size.rows + 1)
 

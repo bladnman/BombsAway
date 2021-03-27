@@ -7,7 +7,7 @@
 import SceneKit
 import UIKit
 extension Board {
-  func stepPlayerShipTo(_ gp: GridPoint) {
+  func stepAttackShipTo(_ gp: GridPoint) {
     // invalid move - bail
     guard isValidMove(gp) else { return }
     
@@ -17,12 +17,14 @@ extension Board {
     stepCellList.removeFirst()
     
     if let stepCell = stepCellList.first {
-      // HIT SHIP ! !  - no move
+      // MARK: HIT SHIP during move
       if stepCell.hasSolidShip {
-        stepCell.targetShipRef?.hitAt(stepCell.gridPoint)
+        stepCell.attackCell()
+        attackShip.takeAHit()
+        delegate.boardSubstantialChage(board: self)
       }
       
-      // just move
+      // keep moving
       else {
         if let nextStepGP = stepCell.gridPoint {
           let moveAction = SCNAction.move(to: positionForGridPoint(nextStepGP), duration: C_MOVE.Player.perCellSec)
@@ -34,7 +36,7 @@ extension Board {
             // not there yet - keep steppin'!
             if nextStepGP != gp {
               DispatchQueue.main.async {
-                self.stepPlayerShipTo(gp)
+                self.stepAttackShipTo(gp)
               }
             }
           }
@@ -49,7 +51,7 @@ extension Board {
   }
   func sendShotTo(_ gp: GridPoint) {
     if let cell = cellFor(gp) {
-      cell.isMiss = true
+      cell.attackCell()
     }
   }
 }

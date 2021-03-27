@@ -12,12 +12,12 @@ import UIKit
 
 extension GameViewController {
   func createNewScene() {
+    createPlayers()
     createSceneObjects()
     createFloor()
     createCamera()
     createLights()
     createBoard()
-//    createOriginIndicator(scene.rootNode)
     createHUD()
   }
   func resetGame() {
@@ -28,24 +28,27 @@ extension GameViewController {
     
     createNewScene()
   }
+  func createPlayers() {
+    player1.name = "John Sea-na"
+    player2.name = "Trevor Noah"
+  }
   func createSceneObjects() {
     sceneView = (view as! SCNView)
     sceneView.delegate = self
-//    scene = SCNScene()
+    
     scene = SCNScene(named: "gamescenes.scnassets/MainScene.scn")
-//    scene.physicsWorld.contactDelegate = self
     sceneView.present(scene, with: .fade(withDuration: 0.5), incomingPointOfView: nil, completionHandler: nil)
     
-    sceneView.allowsCameraControl = true
-    sceneView.showsStatistics = true
     sceneView.backgroundColor = UIColor.black
     
-    sceneView.debugOptions = [
-      //      SCNDebugOptions.showBoundingBoxes,
+    sceneView.showsStatistics = true
+    sceneView.allowsCameraControl = true
+//    sceneView.debugOptions = [
+//        SCNDebugOptions.showBoundingBoxes,
 //      SCNDebugOptions.showWireframe,
 //      SCNDebugOptions.renderAsWireframe,
 //      SCNDebugOptions.showCreases,
-    ]
+//    ]
     
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
     sceneView.addGestureRecognizer(tapGesture)
@@ -88,7 +91,7 @@ extension GameViewController {
       oldBoard.removeAllActions()
       oldBoard.removeFromParentNode()
     }
-    if let oldBoard = self.defendBoard {
+    if let oldBoard = self.defenseBoard {
       oldBoard.removeAllActions()
       oldBoard.removeFromParentNode()
     }
@@ -97,13 +100,19 @@ extension GameViewController {
     offenseBoard = Board(sceneView: sceneView,
                         columns: C_BOARD.Size.columns,
                         rows: C_BOARD.Size.rows,
-                        type: BoardType.defense)
+                        type: BoardType.offense,
+                        defender: player2,
+                        attacker: player1,
+                        delegate: self)
     
     // DEFEND BOARD
-//    defendBoard = Board(sceneView: sceneView,
-//                        columns: C_BOARD.Size.columns,
-//                        rows: C_BOARD.Size.rows,
-//                        type: BoardType.offense)
+    defenseBoard = Board(sceneView: sceneView,
+                        columns: C_BOARD.Size.columns,
+                        rows: C_BOARD.Size.rows,
+                        type: BoardType.defense,
+                        defender: player1,
+                        attacker: player2,
+                        delegate: self)
 
     if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "backBoardNode" }) {
       offenseBoard.position = SCNVector3(-0.5, 0, -0.5)
@@ -112,11 +121,11 @@ extension GameViewController {
     }
     
 
-//    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "bottomBoardNode" }) {
-//      defendBoard.position = SCNVector3(-0.5, 0, -0.5)
-//      defendBoard.name = C_OBJ_NAME.defendBoard
-//      holderNode.addChildNode(defendBoard)
-//    }
+    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "bottomBoardNode" }) {
+      defenseBoard.position = SCNVector3(-0.5, 0, -0.5)
+      defenseBoard.name = C_OBJ_NAME.defendBoard
+      holderNode.addChildNode(defenseBoard)
+    }
   }
   func removeAllShips() {
     createBoard()
@@ -124,11 +133,8 @@ extension GameViewController {
   func createHUD() {
     gameHUD = MainHUD(size: view.frame.size, delegate: self)
     sceneView.overlaySKScene = gameHUD
+    
+    gameHUD?.player = player1
   }
 }
 
-extension GameViewController: SCNSceneRendererDelegate {
-  func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-    // noop
-  }
-}

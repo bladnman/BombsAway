@@ -289,6 +289,17 @@ extension Board {
     }
     
   }
+  func cellListForShipPlacement(boardSize: BoardSize, startGP: GridPoint) -> [BoardCell] {
+    // get end GP relative to ship size
+    let endGP = getEndPointForBoardSize(startGP, boardSize)
+
+    // OFF THE BOARD - no placement
+    if !isWithinBoard(BoardRect(firstGP: startGP, lastGP: endGP)) {
+      return [BoardCell]()
+    }
+    
+    return cellListFor(BoardRange(startGP, boardSize))
+  }
   
   // MARK: CELL CONVINIENCE
   func cellFor(_ gp: GridPoint) -> BoardCell? {
@@ -315,13 +326,30 @@ extension Board {
       yMin: Float(boardRange.rowRange.min() ?? 0) - 0.5,
       yMax: Float(boardRange.rowRange.max() ?? 0) + 0.5)
   }
-  func getEndPoint(_ startGP: GridPoint, _ sizeGP: GridPoint) -> GridPoint {
-    let nearEndGP = startGP + sizeGP
-
-    // adjust for the start point
-    return GridPoint(
-      nearEndGP.column > startGP.column ? nearEndGP.column - 1 : nearEndGP.column + 1,
-      nearEndGP.row > startGP.row ? nearEndGP.row - 1 : nearEndGP.row + 1)
+  func getEndPointForBoardSize(_ startGP: GridPoint, _ shipBoardSize: BoardSize) -> GridPoint {
+    // we want to determine how much we need to move from
+    // the startingGP. Since BoardSizes give us volumes we need to
+    // reduce non-zero values by 1.
+    // i.e. BoardSize tells us something in 1 cell is
+    //        columns = 1, rows = 1
+    // but we don't want to move 1 from the startGP. So we need a 0,0
+    let endColumn = signReducedBy(shipBoardSize.columns, reduceBy: 1)
+    let endRow = signReducedBy(shipBoardSize.rows, reduceBy: 1)
+    return GridPoint(startGP.column + endColumn, startGP.row + endRow)
+//    
+//    let nearEndGP = startGP + sizeGP
+//
+//    // adjust for the start point
+//    return GridPoint(
+//      nearEndGP.column > startGP.column ? nearEndGP.column - 1 : nearEndGP.column + 1,
+//      nearEndGP.row > startGP.row ? nearEndGP.row - 1 : nearEndGP.row + 1)
+  }
+  func signReducedBy(_ value:Int, reduceBy: Int) -> Int {
+    if value < 0 {
+      return value + reduceBy
+    } else {
+      return value - reduceBy
+    }
   }
   func isValid(_ gp: GridPoint) -> Bool {
     return (1...columns ~= gp.column) && (1...rows ~= gp.row)
@@ -354,7 +382,29 @@ extension Board {
            gp.row > 0 &&
            gp.row <= rows
   }
-  
+  func boardSizeFromShipVector(_ vector: SCNVector3) -> BoardSize {
+    var x: Float = vector.x
+    var z: Float = vector.z
+    
+    // this seems odd, but we need integers from our geometry size
+    // and will use Int() to get them (removing any decimal value)
+    // We also want any value to be a minimum of 1. Any space on a board
+    // takes up at least its own cell (and thus 1 row, 1 column).
+    // But if we add a 1 to our values we run the risk of being larger
+    // than intended when we get a whole value:
+    //    e.g.  in   -> geomSize.x = 2.0
+    //          out  -> columns = 3.0   // this would be incorrect
+    
+    if x != 0.0 {
+      x = x > 0 ? x+0.99 : x-0.99
+    }
+    
+    if z != 0.0 {
+      z = z > 0 ? z+0.99 : z-0.99
+    }
+    
+    return BoardSize(columns: Int(x), rows: Int(z))
+  }
   func positionForGridPoint(_ gridPoint: GridPoint) -> SCNVector3 {
     return positionForGridPoint(gridPoint, andHeight: 0.0)
   }

@@ -14,11 +14,14 @@ enum BoardMode {
 enum BoardType {
   case offense, defense
 }
+protocol BoardProtocol {
+  func boardSubstantialChage(board: Board)
+}
 class Board: SCNNode {
   let columns: Int
   let rows: Int
   let type: BoardType
-  var mode: BoardMode = .none { didSet { update() }}
+  var mode = GameActionType.none { didSet { update() }}
   let top: CGFloat
   let right: CGFloat
   let bottom: CGFloat
@@ -27,7 +30,10 @@ class Board: SCNNode {
   let sceneView: SCNView!
   var spawnGP: GridPoint!
   var spawnRect: BoardRect!
-  let attackShip = AttackShip()
+  let attackShip: AttackShip!
+  let attacker: Player!
+  let defender: Player!
+  let delegate: BoardProtocol!
 
   let boardGeom = SCNNode()
   var placementStartNode = SCNNode()
@@ -39,7 +45,7 @@ class Board: SCNNode {
     return useNegativeZ ? -1 : 1
   }
 
-  init(sceneView: SCNView, columns: Int, rows: Int, type: BoardType) {
+  init(sceneView: SCNView, columns: Int, rows: Int, type: BoardType, defender: Player, attacker: Player, delegate: BoardProtocol) {
     self.columns = columns
     self.rows = rows
     self.top = CGFloat(rows)
@@ -48,6 +54,11 @@ class Board: SCNNode {
     self.left = 0
     self.sceneView = sceneView
     self.type = type
+    self.defender = defender
+    self.attacker = attacker
+    self.delegate = delegate
+    self.attackShip = AttackShip(player: attacker)
+    
     super.init()
     
     addChildNode(boardGeom)
@@ -77,7 +88,7 @@ class Board: SCNNode {
     switch gameAction.type {
     case .move:
       if let gp = gameAction.gridPoint {
-        stepPlayerShipTo(gp)
+        stepAttackShipTo(gp)
       }
     case .probe:
       if let gp = gameAction.gridPoint {
@@ -98,14 +109,14 @@ class Board: SCNNode {
   func createCells() {
     for c in 1...columns {
       for r in 1...rows {
-        let cellNode = BoardCell(c, r)
+        let cellNode = BoardCell(c, r, board: self)
         cellNode.delegate = self
         cellNode.position = positionForGridPoint(GridPoint(c, r))
         boardGeom.addChildNode(cellNode)
         setCell(c, r, node: cellNode)
         
         // temporary test code, drop some free probes
-        if chance(100) {
+        if chance(5) {
           cellNode.hasProbe = true
         }
         
@@ -147,31 +158,17 @@ class Board: SCNNode {
       
       // rotate the ship
       ship.eulerAngles = SCNVector3Make(0.0, toRadians(angle: Float(angle)), 0.0)
-      
       // get ship size
-      let shipSizeVector = ScnUtils.rounded(ScnUtils.measureToNodeSpace(ship, to: boardGeom))
-      
-      // get end GP relative to ship size
-      let endGP = getEndPoint(startGP, GridPoint(shipSizeVector))
-
-      // OFF BOARD - no placement
-      if !isWithinBoard(BoardRect(firstGP: startGP, lastGP: endGP)) {
-        continue // next rotation
-      }
+      let shipSizeVector = ScnUtils.measureToNodeSpace(ship, to: boardGeom)
+      let boardSize = boardSizeFromShipVector(shipSizeVector)
       
       // set size and direction sets also
-      ship.boardSize = BoardSize(shipSizeVector)
+      ship.boardSize = boardSize
       
-      let shipCells = cellListFor(BoardRange(startGP, ship.boardSize))
+      let shipCells = cellListForShipPlacement(boardSize: boardSize, startGP: startGP)
       
-      if shipCells.count != length {
-        print("[M@] ----[ PROBLEM ]----")
-        print("[M@] length", length)
-        print("[M@] shipCells", shipCells)
-        print("[M@] gps", startGP, endGP)
-        print("[M@] ship.boardSize", ship.boardSize)
-        print("[M@] shipSizeVector", shipSizeVector)
-        let shipCellsTemp = cellListFor(BoardRange(startGP, ship.boardSize))
+      guard shipCells.isEmpty == false else {
+        continue // next rotation
       }
       
       // can a ship be placed in these cells?
@@ -183,6 +180,7 @@ class Board: SCNNode {
     }
     return success
   }
+
   
   // MARK: UPDATERS
   func update() {

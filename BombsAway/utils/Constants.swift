@@ -88,7 +88,7 @@ struct Constants {
   }
   struct Player {
     static let startingHealth = 3
-    static let startingActionsPerTurn = 9
+    static let startingActionsPerTurn = 7
   }
   struct Movement {
     struct Player {

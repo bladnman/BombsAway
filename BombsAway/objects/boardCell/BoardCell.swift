@@ -18,6 +18,7 @@ class BoardCell: SCNNode {
   var delegate: BoardCellDelegate?
   // data
   let gridPoint: GridPoint!
+  let board: Board!
   var mode = GameActionType.none { didSet { update() } }
   
   // MARK: CELL ELEMENTS
@@ -69,8 +70,9 @@ class BoardCell: SCNNode {
   }
   
   
-  init(_ column: Int, _ row: Int) {
+  init(_ column: Int, _ row: Int, board: Board) {
     self.gridPoint = GridPoint(column, row)
+    self.board = board
 
     super.init()
     
@@ -102,7 +104,19 @@ class BoardCell: SCNNode {
     
     update()
   }
-  
+  @discardableResult
+  func attackCell() -> Bool {
+    
+    // note: we want to deal with collectables at some point
+    
+    if !hasAnyShip {
+      isMiss = true
+      return false
+    } else {
+      targetShipRef?.hitAt(gridPoint)
+      return true
+    }
+  }
   
   // MARK: UPDATES
   func update() {

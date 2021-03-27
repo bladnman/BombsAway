@@ -8,9 +8,14 @@
 import SceneKit
 
 class Player {
-  var name: String?
+  var name = "mad bomber"
+  var hitPoints = C_PLAYER.startingHealth
+  let hitPointsMax = C_PLAYER.startingHealth
   var isCPU = false
-  var playerShip: SCNNode?
+ 
+  var attackShip: AttackShip?
   var offenseBoard: Board?
   var defenseBoard: Board?
+  
+  var isDead: Bool { hitPoints <= 0 }
 }
