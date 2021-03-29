@@ -89,10 +89,14 @@ struct Constants {
   struct Player {
     static let startingHealth = 3
     static let startingActionsPerTurn = 7
+    static let shipSizeArray = [5,4,3,3,2,2,2]
   }
   struct Movement {
     struct Player {
       static let initialStepsPerMove = 5
+      static let initialMoveRadius = 3
+      static let initialProbeRadius = 3
+      static let initialShootRadius = 3
       static let perCellSec = 0.05
       static let perCellPauseSec = 0.01
     }

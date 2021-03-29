@@ -7,9 +7,10 @@
 import SceneKit
 import UIKit
 extension Board {
-  func positionShip(_ ship: TargetShip, _ startGP: GridPoint) {
-    let boardRange = BoardRange(startGP, ship.boardSize)
+  func positionShip(shipData: ShipData) {
+    let boardRange = shipData.boardRange
     let positionFrame = boxForRange(boardRange)
+    let ship = TargetShip(boardSize: shipData.boardSize)
 
     // CALCULATE PROPER X
     // add/remove 0.5 to make sure it covers grid cell
@@ -47,7 +48,7 @@ extension Board {
     }
     
     // UPDATE CELLS
-    let shipCells = cellListFor(BoardRange(startGP, ship.boardSize))
+    let shipCells = cellListFor(shipData.gridPoints)
     shipCells.forEach { cell in
       cell.isLabelVisible = false
       cell.targetShipRef = ship

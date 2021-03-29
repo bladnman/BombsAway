@@ -50,6 +50,16 @@ func dumpHitResults(_ hitResults: [SCNHitTestResult], _ name: String? = nil) {
     }
   }
 }
+func gridPointsFor(boardRange: BoardRange) -> [GridPoint] {
+  var gridPoints = [GridPoint]()
+  for c in boardRange.columnRange {
+    for r in boardRange.rowRange {
+      gridPoints.append(GridPoint(c, r))
+    }
+  }
+  return gridPoints
+}
+
 
 struct Models {
   static let blueCoin: SCNNode = loadNodeFromSCNScene(sceneName: "art.scnassets/coin-test.scn", nodeName: "cointest")!
@@ -123,4 +133,5 @@ func isLeft(_ direction: Direction) -> Bool {
     return false
   }
 }
+
 

@@ -28,6 +28,15 @@ struct BoardRect {
   func contains(_ gp: GridPoint) -> Bool {
     return columnRange.contains(gp.column) && rowRange.contains(gp.row)
   }
+  func containsAny(_ gridPoints:[GridPoint]) -> Bool {
+    for gridPoint in gridPoints {
+      if contains(gridPoint) {
+        return true
+      }
+    }
+    return false
+  }
+  static var zero:BoardRect { BoardRect(firstGP: GridPoint.zero, lastGP: GridPoint.zero) }
 }
 
 struct BoardRange {
@@ -37,12 +46,9 @@ struct BoardRange {
 
 extension BoardRange {
   init(_ gp: GridPoint, _ size: BoardSize) {
-//    assert(size.columns != 0, "BoardRange requires a non-zero value for columns and rows")
-//    assert(size.rows != 0, "BoardRange requires a non-zero value for columns and rows")
-
-    let endCol = gp.column + (size.columns > 0 ? size.columns - 1 : size.columns + 1)
-    let endRow = gp.row + (size.rows > 0 ? size.rows - 1 : size.rows + 1)
-
+    let endCol = gp.column + signReducedBy(size.columns, reduceBy: 1)
+    let endRow = gp.row + signReducedBy(size.rows, reduceBy: 1)
+    
     self.columnRange = rangeFrom(gp.column, endCol)
     self.rowRange = rangeFrom(gp.row, endRow)
   }

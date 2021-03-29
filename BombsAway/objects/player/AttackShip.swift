@@ -10,12 +10,9 @@ import SceneKit
 class AttackShip: SCNNode {
   let NAME = C_OBJ_NAME.player
   let player: Player!
-  var stepSize: Int = C_MOVE.Player.initialStepsPerMove
-  var gridPoint: GridPoint {
-    get {
-      return GridPoint(Int(position.x), Int(position.z))
-    }
-  }
+  
+  // calculateds
+  var gridPoint: GridPoint { GridPoint(Int(position.x), Int(position.z)) }
   
   init(player: Player) {
     self.player = player

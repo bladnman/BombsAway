@@ -57,7 +57,7 @@ class BoardRangeTests: XCTestCase {
 
 @testable import BombsAway
 class BoardSizeTests: XCTestCase {
-  func testBoardSizesColRows() {
+  func test_boardSizesColRows() {
     var boardSize: BoardSize
 
     boardSize = BoardSize(columns: 5, rows: 0)
@@ -65,7 +65,7 @@ class BoardSizeTests: XCTestCase {
     XCTAssertEqual(boardSize.rows, 0)
   }
 
-  func testBoardSizesVectors() {
+  func test_boardSizesVectors() {
     var boardSize: BoardSize
 
     
@@ -78,15 +78,16 @@ class BoardSizeTests: XCTestCase {
     XCTAssertEqual(boardSize.columns, 10)
     XCTAssertEqual(boardSize.rows, 0)
   }
+  func test_gridPointsForRange() {
+    let startGP = GridPoint(2, 2)
+    let boardRange = BoardRange(startGP,
+                            BoardSize(columns: 2, rows: 2))
+    let gridPoints = gridPointsFor(boardRange: boardRange)
+    XCTAssertEqual(gridPoints.contains(where: {$0.column == 2 && $0.row == 2}), true)
+    XCTAssertEqual(gridPoints.contains(where: {$0.column == 2 && $0.row == 3}), true)
+    XCTAssertEqual(gridPoints.contains(where: {$0.column == 3 && $0.row == 2}), true)
+    XCTAssertEqual(gridPoints.contains(where: {$0.column == 3 && $0.row == 3}), true)
+  }
+
 }
 
-//@testable import BombsAway
-//class BoardCellersTests: XCTestCase {
-//  func test_cellListForShipPlacement() {
-//    let cellList = cellListForShipPlacement(
-//
-//    boardSize = BoardSize(columns: 5, rows: 0)
-//    XCTAssertEqual(boardSize.columns, 5)
-//    XCTAssertEqual(boardSize.rows, 0)
-//  }
-//}

@@ -38,6 +38,15 @@ extension Board {
   func cellListFor(_ centerGP: GridPoint, radius: Int = 0) -> [BoardCell] {
     return cellListFor(BoardRange(columnRange: centerGP.column-radius...centerGP.column+radius, rowRange: centerGP.row-radius...centerGP.row+radius))
   }
+  func cellListFor(_ gridPoints: [GridPoint]) -> [BoardCell] {
+    var cells = [BoardCell]()
+    for gridPoint in gridPoints {
+      if let cell = cellFor(gridPoint) {
+        cells.append(cell)
+      }
+    }
+    return cells
+  }
   func cellListForRing(_ centerGP: GridPoint, radius: Int) -> [BoardCell] {
     let colMin = max(1, centerGP.column - radius)
     let colMax = min(columns, centerGP.column + radius)
@@ -321,10 +330,10 @@ extension Board {
   // MARK: OTHERS
   func boxForRange(_ boardRange: BoardRange) -> BoxFrame {
     return BoxFrame(
-      xMin: Float(boardRange.columnRange.min() ?? 0) - 0.5,
-      xMax: Float(boardRange.columnRange.max() ?? 0) + 0.5,
-      yMin: Float(boardRange.rowRange.min() ?? 0) - 0.5,
-      yMax: Float(boardRange.rowRange.max() ?? 0) + 0.5)
+      xMin: Float(boardRange.columnRange.lowerBound) - 0.5,
+      xMax: Float(boardRange.columnRange.upperBound) + 0.5,
+      yMin: Float(boardRange.rowRange.lowerBound) - 0.5,
+      yMax: Float(boardRange.rowRange.upperBound) + 0.5)
   }
   func getEndPointForBoardSize(_ startGP: GridPoint, _ shipBoardSize: BoardSize) -> GridPoint {
     // we want to determine how much we need to move from
@@ -344,13 +353,7 @@ extension Board {
 //      nearEndGP.column > startGP.column ? nearEndGP.column - 1 : nearEndGP.column + 1,
 //      nearEndGP.row > startGP.row ? nearEndGP.row - 1 : nearEndGP.row + 1)
   }
-  func signReducedBy(_ value:Int, reduceBy: Int) -> Int {
-    if value < 0 {
-      return value + reduceBy
-    } else {
-      return value - reduceBy
-    }
-  }
+
   func isValid(_ gp: GridPoint) -> Bool {
     return (1...columns ~= gp.column) && (1...rows ~= gp.row)
   }

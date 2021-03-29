@@ -14,14 +14,17 @@ class GameViewController: UIViewController {
   
   var scene: SCNScene!
   var sceneView: SCNView!
+
+  var gameStore = GameStore()
+  var player: Player!
+  var nextAction: GameAction?
+  var currentTurn = GameTurn(playerId: -1)
+  
   var offenseBoard: Board!
   var defenseBoard: Board!
-  var player: SCNNode!
   var gameHUD: MainHUD?
-  var nextAction: GameAction?
-  var currentTurn = GameTurn()
-  var player1 = Player()
-  var player2 = Player()
+  
+  var playerNode: SCNNode!
   
   // CAMERA
   var camera: SCNNode!
@@ -34,16 +37,9 @@ class GameViewController: UIViewController {
   }
   func initializeGame() {
     createNewScene()
-    startNewTurn()
   }
-  func startNewTurn() {
-    currentTurn = GameTurn()
-    currentTurn.board = offenseBoard
-  }
-  
-  
-  
-  
+
+  // OVERRIDES
   override var shouldAutorotate: Bool {
     return true
   }
@@ -84,9 +80,10 @@ extension GameViewController: MainHUDProtocol {
 extension GameViewController: BoardProtocol {
   func boardSubstantialChage(board: Board) {
     // MARK: DEAD
-    if board.attacker.isDead {
-      currentTurn.isOver = true
-    }
+    print("[M@] CHECK FOR DEAD A NEW WAY BUB")
+//    if board.attacker.isDead {
+//      currentTurn.isOver = true
+//    }
     
     gameHUD?.update()
   }

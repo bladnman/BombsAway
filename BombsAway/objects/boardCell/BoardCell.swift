@@ -44,6 +44,7 @@ class BoardCell: SCNNode {
   var selectableIndicator: SCNNode!
   var probabilityIndicator: ProbabilityIndicator?
   var missIndicator: SCNNode?
+  var boardStore: BoardStore
   
   
   var floorColor: UIColor {
@@ -70,9 +71,10 @@ class BoardCell: SCNNode {
   }
   
   
-  init(_ column: Int, _ row: Int, board: Board) {
+  init(_ column: Int, _ row: Int, board: Board, boardStore: BoardStore) {
     self.gridPoint = GridPoint(column, row)
     self.board = board
+    self.boardStore = boardStore
 
     super.init()
     
@@ -102,7 +104,7 @@ class BoardCell: SCNNode {
     selectableIndicator.opacity = 0.0
     addChildNode(selectableIndicator)
     
-    update()
+    update() // TODO: delay me... don't update immediately
   }
   @discardableResult
   func attackCell() -> Bool {
@@ -125,6 +127,11 @@ class BoardCell: SCNNode {
     updateHitNode()
     updateSelectableIndicator()
     updateMissIndicator()
+    
+    updateProbeFromBoardStore()
+  }
+  func updateProbeFromBoardStore() {
+    hasProbe = boardStore.probes.contains(where: {$0.gridPoint == gridPoint})
   }
   func updateFloor() {
     floor?.geometry?.firstMaterial?.diffuse.contents = floorColor

@@ -49,3 +49,10 @@ func rangeFrom(_ oneNumber: Int, _ anotherNumber: Int) -> CountableClosedRange<I
   }
   return oneNumber...anotherNumber
 }
+func signReducedBy(_ value:Int, reduceBy: Int) -> Int {
+  if value < 0 {
+    return value + reduceBy
+  } else {
+    return value - reduceBy
+  }
+}

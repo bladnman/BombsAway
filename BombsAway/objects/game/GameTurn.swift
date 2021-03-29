@@ -11,9 +11,15 @@ class GameTurn: CustomStringConvertible {
   var actions = [GameAction]()
   var isOver = false
   var board: Board?
+  var playerId: Int
   
   var nextActionType = GameActionType.none { didSet { update() }}
   var nextActionGridPoint: GridPoint? { didSet { update() }}
+  
+  init(playerId: Int) {
+    self.playerId = playerId
+  }
+  
   
   func update() {
     
