@@ -56,27 +56,28 @@ class MainHUD: SKScene {
     self.isUserInteractionEnabled = true
     self.hudDelegate = delegate
     
-    setup()
+    self.setup()
   }
   
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   func setup() {
-    removeAllChildren()
-    
-    switch state {
-    case .turn:
-      setupForTurn()
-    case .endOfTurn:
-      setupForEndOfTurn()
-    case .handoff:
-      setupForHandoff()
-    case .victory:
-      setupForVictory()
+    DispatchQueue.main.async {
+      self.removeAllChildren()
+      switch self.state {
+      case .turn:
+        self.setupForTurn()
+      case .endOfTurn:
+        self.setupForEndOfTurn()
+      case .handoff:
+        self.setupForHandoff()
+      case .victory:
+        self.setupForVictory()
+      }
+      
+      self.update()
     }
-    
-    update()
   }
   func setupForTurn() {
     addGameActionPanelGroup()
@@ -155,7 +156,9 @@ class MainHUD: SKScene {
     nextPlayerNameLabel.position = CGPoint(x: self.frame.midX, y: self.frame.midY - 40.0)
     
     func handlePress(_ buttonIndex: Int) {
-      hudDelegate?.mainHUDMoveToNextPlayerPressed()
+      DispatchQueue.main.async {
+        self.hudDelegate?.mainHUDMoveToNextPlayerPressed()
+      }
     }
     
     let button = LabelButton(text: "Understood", size: CGSize(width: 250.0, height: 100), action: handlePress, index: 0)
@@ -178,7 +181,9 @@ class MainHUD: SKScene {
     nextPlayerNameLabel.position = CGPoint(x: self.frame.midX, y: self.frame.midY - 60.0)
     
     func handlePress(_ buttonIndex: Int) {
-      hudDelegate?.mainHUDHandoffCompletePressed()
+      DispatchQueue.main.async {
+        self.hudDelegate?.mainHUDHandoffCompletePressed()
+      }
     }
     
     let button = LabelButton(text: "Start My Turn", size: CGSize(width: 250.0, height: 100), action: handlePress, index: 0)
@@ -203,7 +208,7 @@ class MainHUD: SKScene {
 //    func handlePress(_ buttonIndex: Int) {
 //      hudDelegate?.mainHUDHandoffCompletePressed()
 //    }
-//    
+//
 //    let button = LabelButton(text: "Play Again", size: CGSize(width: 250.0, height: 100), action: handlePress, index: 0)
 //    button.color = C_COLOR.green
 //    addChild(button)
