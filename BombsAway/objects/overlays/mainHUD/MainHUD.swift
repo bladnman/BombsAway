@@ -12,6 +12,7 @@ protocol MainHUDProtocol {
   func mainHUDMovePressed()
   func mainHUDProbePressed()
   func mainHUDShootPressed()
+  func mainHUDHealthPressed()
   func mainHUDMoveToNextPlayerPressed()
   func mainHUDHandoffCompletePressed()
 }
@@ -113,6 +114,7 @@ class MainHUD: SKScene {
   func addPlayerHealth() {
     healthNode = AttackShipHealth()
     if let healthNode = self.healthNode {
+      healthNode.name = "healthNode"
       addChild(healthNode)
       let hWidth = healthNode.frame.size.width
       let hHeight = healthNode.frame.size.height
@@ -231,16 +233,20 @@ class MainHUD: SKScene {
 extension MainHUD {
   // MARK: TOUCHES
   func handleTouches(_ touches: Set<UITouch>, for touchPhase: TouchPhase) {
-//    for touch: AnyObject in touches {
-//      let location = touch.location(in: self)
-//      if redBox == self.atPoint(location) {
-//        print("redBox Touch event")
-//      }
-//    }
     isHandlingTouch = touchPhase == .start
   }
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     handleTouches(touches, for: .start)
+    
+    for touch: AnyObject in touches {
+      let location = touch.location(in: self)
+      let touchedNode = self.atPoint(location)
+      
+      // some parent is health node
+      if SKUtils.getAncestorWithName(touchedNode, name: "healthNode") != nil {
+        hudDelegate?.mainHUDHealthPressed()
+      }
+    }
   }
   override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
     handleTouches(touches, for: .end)

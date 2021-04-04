@@ -144,3 +144,10 @@ class ScnUtils {
 }
 
 
+extension SCNVector3 {
+  static func ==(vect1: SCNVector3, vect2: SCNVector3) -> Bool {
+    return vect1.x == vect2.x &&
+            vect1.y == vect2.y &&
+            vect1.z == vect2.z
+  }
+}

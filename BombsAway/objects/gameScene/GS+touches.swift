@@ -10,10 +10,46 @@ import SceneKit
 import SpriteKit
 import UIKit
 
-// MARK: OVERLAY DELEGATE
+// MARK: POV - camera and such that
+extension GameViewController {
+  func povNear() {
+    let duration = 0.2
+    let moveAction = SCNAction.move(to: cameraNear.position, duration: duration)
+    moveAction.timingMode = .easeOut
 
+    let rotateAction = SCNAction.rotate(toAxisAngle: cameraNear.rotation, duration: duration)
+
+    let groupAction = SCNAction.group([moveAction, rotateAction])
+    cameraNode.runAction(groupAction)
+  }
+  func povFar() {
+    let duration = 0.2
+    let moveAction = SCNAction.move(to: cameraFar.position, duration: duration)
+    moveAction.timingMode = .easeOut
+    let rotateAction = SCNAction.rotate(toAxisAngle: cameraFar.rotation, duration: duration)
+    let groupAction = SCNAction.group([moveAction, rotateAction])
+    cameraNode.runAction(groupAction)
+  }
+  func povOmni() {
+//    sceneView.pointOfView = cameraOmni
+  }
+}
+
+// MARK: HUD DELEGATE
 extension GameViewController: MainHUDProtocol {
-
+  func mainHUDHealthPressed() {
+    
+    if isPOVNear {
+      povFar()
+    }
+    else if isPOVOmni {
+      povNear()
+    }
+    else if isPOVFar {
+//      povOmni()
+      povNear()
+    }
+  }
   func mainHUDMovePressed() {
     nextActionType = .move
     gameStore.currentPlayerAttackingBoard?.mode = .move
@@ -41,9 +77,7 @@ extension GameViewController: MainHUDProtocol {
 }
 
 // MARK: TOUCH HANDLERS
-
 extension GameViewController {
-  
   // move me to another place
   func doAction(gameAction: GameAction, boardOwnerId: Int) {
     // look up the board to do action on
@@ -57,7 +91,6 @@ extension GameViewController {
     nextActionType = .none
     nextActionGridPoint = nil
   }
-  
   func cellSelected(cell: BoardCell) {
     // make sure this cell has an action mode
     if cell.mode != .none {

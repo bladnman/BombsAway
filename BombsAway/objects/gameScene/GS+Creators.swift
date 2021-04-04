@@ -68,7 +68,7 @@ extension GameViewController {
     sceneView.backgroundColor = UIColor.black
     
     sceneView.showsStatistics = true
-    sceneView.allowsCameraControl = true
+//    sceneView.allowsCameraControl = true
 //    sceneView.debugOptions = [
 //        SCNDebugOptions.showBoundingBoxes,
 //      SCNDebugOptions.showWireframe,
@@ -88,13 +88,22 @@ extension GameViewController {
     scene.rootNode.addChildNode(floorNode)
   }
   func createCamera() {
-    camera = SCNNode()
-    camera.camera = SCNCamera()
-    scene.rootNode.addChildNode(camera)
+    cameraOmni = ScnUtils.getChildWithName(scene!.rootNode.childNodes, name: "camera")!
+    cameraNear = ScnUtils.getChildWithName(scene!.rootNode.childNodes, name: "camera_near")!
+    cameraFar = ScnUtils.getChildWithName(scene!.rootNode.childNodes, name: "camera_far")!
     
-    // place the camera
-    camera.position = SCNVector3(x: 1, y: 9, z: -6)
-    camera.eulerAngles = SCNVector3(x: -toRadians(angle: 70), y: 0, z: 0)
+    // start with omni
+    cameraNode = cameraOmni
+    sceneView.pointOfView = cameraNode
+    
+    let usesOrthographicProjection = false
+    let orthographicScale = 7.0
+    cameraNear.camera?.usesOrthographicProjection = usesOrthographicProjection
+    cameraNear.camera?.orthographicScale = orthographicScale
+    cameraFar.camera?.usesOrthographicProjection = usesOrthographicProjection
+    cameraFar.camera?.orthographicScale = orthographicScale
+    cameraOmni.camera?.usesOrthographicProjection = usesOrthographicProjection
+    cameraOmni.camera?.orthographicScale = orthographicScale
     
   }
   func createLights() {

@@ -33,4 +33,9 @@ class SKUtils {
     toolNode.zPosition = 1000
     node.addChild(toolNode)
   }
+  static func getAncestorWithName(_ node: SKNode?, name: String) -> SKNode? {
+    if node == nil { return nil }
+    if node?.name == name { return node }
+    return getAncestorWithName(node?.parent, name: name)
+  }
 }

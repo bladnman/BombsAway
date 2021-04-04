@@ -27,11 +27,18 @@ class GameViewController: UIViewController {
   
   var playerNode: SCNNode!
   
-  // CAMERA
-  var camera: SCNNode!
   var lastWidthRatio: Float = 0
   var lastHeightRatio: Float = 0
-
+  
+  // CAMERA
+  var cameraNode: SCNNode!
+  var cameraOmni: SCNNode!
+  var cameraNear: SCNNode!
+  var cameraFar: SCNNode!
+  var isPOVNear: Bool { cameraNode.position == cameraNear.position }
+  var isPOVFar: Bool { cameraNode.position == cameraFar.position }
+  var isPOVOmni: Bool { cameraNode.position == cameraOmni.position }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     initializeGame()
@@ -58,12 +65,12 @@ class GameViewController: UIViewController {
 }
 
 // MARK: GAME LIFECYCLE
-
 extension GameViewController {
+
   func lifeCy_beginTurn() {
+
     gameStore.startNextTurn()
     
-    // MARK: this is temporarily rushing to next attack
     if let currentTurnPlayerStore = gameStore.currentTurnPlayerStore {
       gameHUD?.playerStore = currentTurnPlayerStore
     }
@@ -73,27 +80,18 @@ extension GameViewController {
       createAllBoards()
     }
     
-    lifeCy_beginAttack()
+    // we show last player's turn first
+    lifeCy_defend()
     
-    // MARK: replay last turn
-    // MARK: begin attack
-  }
-  func lifeCy_endTurn() {
-    gameStore.currentTurn.cancelRemainingActions()
-    gameHUD?.state = .endOfTurn
-  }
-  func lifeCy_startPassAndPlayHandoff() {
-    gameHUD?.state = .handoff
+    // then we move on with attack
+    lifeCy_attack()
     
-    // tear down boards
-    removeAllBoards()
   }
-  func lifeCy_endPassAndPlayHandoff() {
-    lifeCy_beginTurn()
+  func lifeCy_defend() {
+    povNear()
   }
-  func lifeCy_playLastTurn() {
-  }
-  func lifeCy_beginAttack() {
+  func lifeCy_attack() {
+//    povFar()
     gameHUD?.state = .turn
     if let currentTurnPlayerStore = gameStore.currentTurnPlayerStore {
       
@@ -110,13 +108,28 @@ extension GameViewController {
       }
     }
   }
+  func lifeCy_endTurn() {
+//    povOmni()
+    gameStore.currentTurn.cancelRemainingActions()
+    gameHUD?.state = .endOfTurn
+  }
+  func lifeCy_startPassAndPlayHandoff() {
+    gameHUD?.state = .handoff
+    
+    // tear down boards
+    removeAllBoards()
+  }
+  func lifeCy_endPassAndPlayHandoff() {
+    lifeCy_beginTurn()
+  }
+
+
   func lifeCy_victory() {
     gameHUD?.state = .victory
   }
 }
 
 // MARK: BOARD DELEGATE
-
 extension GameViewController: BoardProtocol {
   func boardActionComplete(gameAction: GameAction, board: Board) {
     if let targetPlayer = gameStore.playerStoreForId(gameAction.actionTargetId) {
@@ -149,7 +162,6 @@ extension GameViewController: BoardProtocol {
 }
 
 // MARK: SCENE UPDATE DELEGATE
-
 extension GameViewController: SCNSceneRendererDelegate {
   func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
     // noop
