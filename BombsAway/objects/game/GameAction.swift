@@ -10,11 +10,21 @@ import SceneKit
 class GameAction: CustomStringConvertible {
 
   var type: GameActionType
-  var gridPoint: GridPoint?
+  var actionOwnerId: Int
+  var actionTargetId: Int
+  var gridPoints = [GridPoint]()
 
-  init(_ type: GameActionType, _ gridPoint: GridPoint? = nil) {
+  init(type: GameActionType,
+       actionOwnerId: Int,
+       actionTargetId: Int,
+       gridPoints: [GridPoint]? = nil) {
     self.type = type
-    self.gridPoint = gridPoint
+    self.actionOwnerId = actionOwnerId
+    self.actionTargetId = actionTargetId
+    if gridPoints != nil {
+      self.gridPoints.append(contentsOf: gridPoints!)
+    }
   }
-  static var zero: GameAction { return GameAction(.none) }
+  static var zero: GameAction { return GameAction(type: .none, actionOwnerId: -1, actionTargetId: -1) }
+  static var canceled: GameAction { return GameAction(type: .canceled, actionOwnerId: -1, actionTargetId: -1) }
 }

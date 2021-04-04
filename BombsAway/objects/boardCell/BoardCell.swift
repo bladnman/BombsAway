@@ -10,16 +10,20 @@ protocol BoardCellDelegate {
   func bcellGetSurroundingProbeCount(_ gp: GridPoint) -> Int
   func bcellGetSurroundingThreats(_ gp: GridPoint) -> ThreatDirections
 }
-
+enum BoardCellShotType {
+  case none, miss, hit, sunk
+}
 class BoardCell: SCNNode {
   
   let NAME: String = C_OBJ_NAME.boardCell
   var probability: CellProbabilityController!
   var delegate: BoardCellDelegate?
+  
   // data
+  var boardStore: BoardStore
   let gridPoint: GridPoint!
   let board: Board!
-  var mode = GameActionType.none { didSet { update() } }
+  var mode = GameActionType.none { didSet { updateSelectableIndicator() } }
   
   // MARK: CELL ELEMENTS
   // only one of:
@@ -41,15 +45,26 @@ class BoardCell: SCNNode {
   var potentialIndicator: SCNNode?
   var spawnPointIndicator: SCNNode?
   var spawnAreaIndicator: SCNNode?
-  var selectableIndicator: SCNNode!
+  var selectableIndicator: SCNNode?
   var probabilityIndicator: ProbabilityIndicator?
-  var missIndicator: SCNNode?
-  var boardStore: BoardStore
+  var shotIndicator: SCNNode?
   
   
   var floorColor: UIColor {
     return UIColor.fromHex("#34495e")
 //    return probability.getFloorColor()
+  }
+  var shotType: BoardCellShotType {
+    if shotIndicator == nil {
+      return .none
+    }
+    
+    switch shotIndicator!.name {
+      case C_OBJ_NAME.hitCoin: return .hit
+      case C_OBJ_NAME.missIndicator: return .miss
+      case C_OBJ_NAME.sunkCoin: return .sunk
+      default: return .none
+    }
   }
 
   // MARK: ISers
@@ -59,17 +74,22 @@ class BoardCell: SCNNode {
   var isHighlighted: Bool = false { didSet { update() } }
   var isMiss: Bool = false { didSet { update() } }
   
-  var hasSolidShip: Bool { return targetShipRef?.isSolidAt(gridPoint) ?? false }
-  var hasAnyShip: Bool { return targetShipRef != nil }
-  var isClearForShipPlacement: Bool { return !hasAnyShip && !isSpawnRegion }
-  var isClearForMovement: Bool { return !hasSolidShip }
+  var shipData: ShipData? { boardStore.getShipAtGridpoint(gridPoint) }
+  var hasSolidShip: Bool {
+    return shipData != nil &&
+      shotType != .hit &&
+      shotType != .sunk
+  }
+  var hasAnyShip: Bool { shipData != nil }
+  var isClearForShipPlacement: Bool { !hasAnyShip && !isSpawnRegion }
+  var isClearForMovement: Bool { !hasSolidShip }
   var hasCollectible: Bool = false
   var hasProbe: Bool = false {
     didSet {
       updateProbe()
     }
   }
-  
+//  var hasShot: Bool { boardStore.shots.contains(where: {$0.gridPoint == gridPoint}) }
   
   init(_ column: Int, _ row: Int, board: Board, boardStore: BoardStore) {
     self.gridPoint = GridPoint(column, row)
@@ -96,15 +116,9 @@ class BoardCell: SCNNode {
     
     floor = ScnUtils.getChildWithName(baseNode.childNodes, name: C_OBJ_NAME.cellFloor)
 
-    selectableIndicator = ScnUtils.deepCopyNode(Models.selectableIndicator)
-    selectableIndicator.opacity = 0.0
-    addChildNode(selectableIndicator)
-    
-    selectableIndicator = ScnUtils.deepCopyNode(Models.selectableIndicator)
-    selectableIndicator.opacity = 0.0
-    addChildNode(selectableIndicator)
-    
-    update() // TODO: delay me... don't update immediately
+    DispatchQueue.main.async {
+      self.update()
+    }
   }
   @discardableResult
   func attackCell() -> Bool {
@@ -124,14 +138,20 @@ class BoardCell: SCNNode {
   func update() {
     updateFloor()
     updateLabel()
-    updateHitNode()
     updateSelectableIndicator()
-    updateMissIndicator()
     
     updateProbeFromBoardStore()
+    updateShotFromBoardStore()
+    
   }
   func updateProbeFromBoardStore() {
     hasProbe = boardStore.probes.contains(where: {$0.gridPoint == gridPoint})
+  }
+  func updateShotFromBoardStore() {
+    let hasShot = boardStore.shots.contains(where: {$0.gridPoint == gridPoint})
+    if hasShot == true {
+      updateShotIndicator()
+    }
   }
   func updateFloor() {
     floor?.geometry?.firstMaterial?.diffuse.contents = floorColor
@@ -155,20 +175,30 @@ class BoardCell: SCNNode {
     }
   }
   func showSelectableIndicator(_ duration: Double = C_MOVE.BoardCell.SelectIndicator.fadeInSec) {
-    selectableIndicator.removeAction(forKey: "fadeIn")
-    selectableIndicator.removeAction(forKey: "fadeOut")
+    if selectableIndicator == nil {
+      selectableIndicator = Models.selectableIndicator
+      
+      if let selectableIndicator = self.selectableIndicator {
+        selectableIndicator.opacity = 0.0
+        addChildNode(selectableIndicator)
+        
+        let fadeAction = SCNAction.fadeIn(duration: duration)
+        fadeAction.timingMode = .easeInEaseOut
+        selectableIndicator.runAction(fadeAction, forKey: "fadeIn")
+      }
+    }
 
-    let fadeAction = SCNAction.fadeIn(duration: duration)
-    fadeAction.timingMode = .easeInEaseOut
-    selectableIndicator!.runAction(fadeAction, forKey: "fadeIn")
   }
   func hideSelectableIndicator(_ duration: Double = C_MOVE.BoardCell.SelectIndicator.fadeOutSec) {
-    selectableIndicator.removeAction(forKey: "fadeIn")
-    selectableIndicator.removeAction(forKey: "fadeOut")
+    selectableIndicator?.removeAction(forKey: "fadeIn")
     
     let fadeAction = SCNAction.fadeOut(duration: duration)
     fadeAction.timingMode = .easeOut
-    selectableIndicator!.runAction(fadeAction, forKey: "fadeOut")
+    
+    selectableIndicator?.runAction(fadeAction, forKey: "fadeOut") {
+      self.selectableIndicator?.removeFromParentNode()
+      self.selectableIndicator = nil
+    }
   }
 
   // MARK: LABEL
@@ -198,42 +228,36 @@ class BoardCell: SCNNode {
   }
   
   
-  // MARK: HIT INDICATOR
-  func updateHitNode() {
+  // MARK: SHOT INDICATOR
+  func updateShotIndicator() {
     
-    // NO SHIP - bail
-    guard let targetShip = targetShipRef else {
-      removeHitCoin()
-      return
+    var finalShotMode: BoardCellShotType = .none
+    
+    // SHIP!
+    if hasAnyShip {
+      finalShotMode = boardStore.isShipSunk(shipData) ? .sunk : .hit
     }
     
-    // NOT HIT - bail
-    guard targetShip.isHitAt(gridPoint) else {
-      removeHitCoin()
-      return
+    // NO SHIP
+    else {
+      finalShotMode = .miss
     }
-    createHitCoin()
-  }
-  func createHitCoin() {
-    // remove first (in case we toggled from hit to sunk)
-    removeHitCoin()
-    
-    if let ship = targetShipRef {
-      // NOT HIT - bail
-      guard ship.isHitAt(gridPoint) else {
-        return
+
+    // MAKE SURE THERE IS A CHANGE
+    if finalShotMode != shotType {
+      shotIndicator?.removeFromParentNode()
+      
+      switch finalShotMode {
+      case .miss: shotIndicator = Models.missIndicator
+      case .hit: shotIndicator = Models.blueCoin
+      case .sunk: shotIndicator = Models.redCoin
+      default: shotIndicator = nil
       }
       
-      // sunk or not
-      let coin = ship.isSunk ? Models.redCoin.clone() : Models.blueCoin.clone()
-      coin.name = C_OBJ_NAME.hitcoin
-      addChildNode(coin)
+      if shotIndicator != nil {
+        addChildNode(shotIndicator!)
+      }
     }
-  }
-  func removeHitCoin() {
-    childNodes
-      .filter { $0.name == C_OBJ_NAME.hitcoin }
-      .forEach { coin in coin.removeFromParentNode() }
   }
   
   
@@ -289,27 +313,5 @@ class BoardCell: SCNNode {
     probabilityIndicator = nil
   }
   
-  
-  // MARK: MISS INDICATOR
-  func updateMissIndicator() {
-    if isMiss {
-      showMissIndicator()
-    } else {
-      hideMissIndicator()
-    }
-  }
-  func showMissIndicator() {
-    // already showing - bail
-    guard missIndicator == nil else { return }
-    missIndicator = Models.missIndicator
 
-    addChildNode(missIndicator!)
-  }
-  func hideMissIndicator() {
-    // not showing - bail
-    guard missIndicator != nil else { return }
-    missIndicator?.removeFromParentNode()
-    missIndicator = nil
-
-  }
 }

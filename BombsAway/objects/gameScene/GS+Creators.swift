@@ -18,21 +18,37 @@ extension GameViewController {
     createCamera()
     createLights()
     createAllBoards()
+    
+    // MARK: todo... make hud not HAVE to be last
+    lifeCy_beginTurn()
     createHUD()
+    
   }
   func setupGameStore() {
+    
+    let names = [
+      "Tom Cruise",
+      "Trevor Noah",
+      "John Sea-na",
+      "Moby",
+      "Natalie Port-man",
+      "Catfish Stevens",
+      "Fin Diesel",
+      "Sailor Swift"
+    ].shuffled()
+    
+    
     self.gameStore = GameStore()
     gameStore.gameSettings = GameSettings()
-    let player1Store = PlayerStore(playerId: 1, playerName: "Tom Cruise", gameSettings: gameStore.gameSettings)
-    let player2Store = PlayerStore(playerId: 2, playerName: "Trevor Noah", gameSettings: gameStore.gameSettings)
+    let player1Store = PlayerStore(playerId: 0, playerName: names[0], gameSettings: gameStore.gameSettings)
+    let player2Store = PlayerStore(playerId: 1, playerName: names[1], gameSettings: gameStore.gameSettings)
     
-    gameStore.playerStores.append(player1Store)
-    gameStore.playerStores.append(player2Store)
+    // MARK: todo manage targeting better
+    player1Store.targetPlayerId = 1
+    player2Store.targetPlayerId = 0
     
-    gameStore.startNextTurn()
-    
-    // first player in the store is always us
-    self.player = gameStore.playerStores.first!.player
+    gameStore.addPlayerStore(player1Store)
+    gameStore.addPlayerStore(player2Store)
   }
   func resetGame() {
     scene.rootNode.enumerateChildNodes { node, _ in
@@ -97,70 +113,76 @@ extension GameViewController {
 //    scene.rootNode.addChildNode(ambientLightNode)
   }
   func createAllBoards() {
-    if let oldBoard = self.offenseBoard {
-      oldBoard.removeAllActions()
-      oldBoard.removeFromParentNode()
-    }
-    if let oldBoard = self.defenseBoard {
-      oldBoard.removeAllActions()
-      oldBoard.removeFromParentNode()
+    removeAllBoards()
+    if let currentPlayer = gameStore.currentTurnPlayerStore {
+      
+      
+      farBoard = createBoardForPlayer(gameStore: gameStore,
+                                      ownerId: currentPlayer.targetPlayerId,
+                                      viewerId: currentPlayer.playerId)
+      
+      nearBoard = createBoardForPlayer(gameStore: gameStore,
+                                       ownerId: currentPlayer.playerId,
+                                       viewerId: currentPlayer.playerId)
+
+
+      if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "backBoardNode" }) {
+        farBoard.position = SCNVector3(-0.5, 0, -0.5)
+        farBoard.name = C_OBJ_NAME.attackBoard
+        holderNode.addChildNode(farBoard)
+      }
+      
+
+      if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "bottomBoardNode" }) {
+        nearBoard.position = SCNVector3(-0.5, 0, -0.5)
+        nearBoard.name = C_OBJ_NAME.defendBoard
+        holderNode.addChildNode(nearBoard)
+      }
     }
 
-    // MARK: programatically draw boards here
-    defenseBoard = createBoard(gameStore: gameStore, ownerId: 1)
-    offenseBoard = createBoard(gameStore: gameStore, ownerId: 2)
-
-    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "backBoardNode" }) {
-      offenseBoard.position = SCNVector3(-0.5, 0, -0.5)
-      offenseBoard.name = C_OBJ_NAME.attackBoard
-      holderNode.addChildNode(offenseBoard)
+  }
+  func removeAllBoards() {
+    guard farBoard != nil else {
+      return
     }
     
-
-    if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == "bottomBoardNode" }) {
-      defenseBoard.position = SCNVector3(-0.5, 0, -0.5)
-      defenseBoard.name = C_OBJ_NAME.defendBoard
-      holderNode.addChildNode(defenseBoard)
-    }
+    farBoard.removeFromParentNode()
+    nearBoard.removeFromParentNode()
+    farBoard = nil
+    nearBoard = nil
+//    for holderNodeName in ["backBoardNode", "bottomBoardNode"] {
+//      if let holderNode = scene.rootNode.childNodes.first(where: { $0.name == holderNodeName }) {
+//        holderNode.enumerateChildNodes( { node, _ in node.removeFromParentNode() })
+//      }
+//    }
   }
   func removeAllShips() {
     createNewScene()
   }
   func createHUD() {
-    gameHUD = MainHUD(size: view.frame.size, delegate: self)
+    gameHUD = MainHUD(gameStore: gameStore, playerStore: gameStore.currentTurnPlayerStore!, size: view.frame.size, delegate: self)
     sceneView.overlaySKScene = gameHUD
-    gameHUD?.player = gameStore.playerStoreForId(currentTurn.playerId)?.player
   }
 }
 
 
 // MARK: GAME BOARD CREATION
 extension GameViewController {
-  func createBoard(gameStore: GameStore, ownerId: Int) -> Board {
-    let boardStore = gameStore.playerStoreForId(ownerId)!.boardStore
+  func createBoardForPlayer(gameStore: GameStore, ownerId: Int, viewerId: Int) -> Board {
+    let ownerBoardStore = gameStore.playerStoreForId(ownerId)!.boardStore
     
-    // first generate spawn point info
-    boardStore.spawnPoint = randomSpawnPointFor(boardSize: boardStore.boardSize)
-    boardStore.spawnRect = spawnRectFor(spawnPoint: boardStore.spawnPoint)
-    
-    
-    createNewShips(gameStore: gameStore, boardStore: boardStore)
-    
-    // MARK: TEMP PROBES
-    for _ in 1...5 {
-      let gp = GridPoint(roll(boardStore.boardSize.columns), roll(boardStore.boardSize.rows))
-      boardStore.probes.append(ProbeData(gridPoint: gp))
+    // first time we want to add proper data
+    // -ships, -spawn point, etc
+    if ownerBoardStore.ships.count < 1 {
+      createInitialBoardStoreData(boardStore: ownerBoardStore)
     }
 
-    
-    
-    // MARK: THIS IS LAST
     let board = Board(gameStore: gameStore,
                       ownerId: ownerId,
-                      viewerId: player.playerId,
+                      viewerId: viewerId,
                       delegate: self)
     
-    
+    ownerBoardStore.boardRef = board
     return board
   }
   func createNewShips(gameStore: GameStore, boardStore: BoardStore) {
@@ -175,6 +197,18 @@ extension GameViewController {
         return
       }
     }
+  }
+  func createInitialBoardStoreData(boardStore: BoardStore) {
+    boardStore.spawnPoint = randomSpawnPointFor(boardSize: boardStore.boardSize)
+    boardStore.spawnRect = spawnRectFor(spawnPoint: boardStore.spawnPoint)
+    
+    createNewShips(gameStore: gameStore, boardStore: boardStore)
+    
+    // MARK: TEMP PROBES
+//    for _ in 1...5 {
+//      let gp = GridPoint(roll(ownerBoardStore.boardSize.columns), roll(ownerBoardStore.boardSize.rows))
+//      ownerBoardStore.probes.append(ProbeData(gridPoint: gp))
+//    }
   }
   
   

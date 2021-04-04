@@ -9,29 +9,24 @@ import SceneKit
 
 class AttackShip: SCNNode {
   let NAME = C_OBJ_NAME.player
-  let player: Player!
+  let playerStore: PlayerStore
   
   // calculateds
   var gridPoint: GridPoint { GridPoint(Int(position.x), Int(position.z)) }
   
-  init(player: Player) {
-    self.player = player
+  init(playerStore: PlayerStore) {
+    self.playerStore = playerStore
     super.init()
     self.name = NAME
     self.addChildNode(Models.attackShip.clone())
   }
   
-  func takeAHit() {
-    // the player was hit... reduce HP
-    player.hitPoints -= 1
-    
-    // MARK: SHIP DIED
-    if player.isDead {
-      animateDeath()
-    }
-  }
   func animateDeath() {
     let fadeAction = SCNAction.fadeOut(duration: 1.5)
+    runAction(fadeAction)
+  }
+  func animateRespawn() {
+    let fadeAction = SCNAction.fadeIn(duration: 1.5)
     runAction(fadeAction)
   }
   

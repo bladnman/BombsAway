@@ -44,7 +44,7 @@ class LabelButton: SKSpriteNode {
     isUserInteractionEnabled = true
     addChild(labelNode)
 
-    self.color = UIColor.red
+    self.color = UIColor.clear
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -54,6 +54,12 @@ class LabelButton: SKSpriteNode {
   
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     state = .down
+
+
+    // MARK: THIS IS NOT CORRECT!
+    // we need to test if it was our button that was released
+    // for now, we will just do the action on PRESS
+    action(index)
   }
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
     let touch: UITouch = touches.first! as UITouch
@@ -67,17 +73,24 @@ class LabelButton: SKSpriteNode {
   }
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     let touch: UITouch = touches.first! as UITouch
-    let location: CGPoint = touch.location(in: self)
-    print("[M@] heard press ended")
-    // pressed!
-    if self.contains(location) {
-      action(index)
-    }
-    
-    state = .up
+    touchDoneAtLocation(touch.location(in: self))
   }
   override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+    let touch: UITouch = touches.first! as UITouch
+    touchDoneAtLocation(touch.location(in: self))
+  }
+  func touchDoneAtLocation(_ location: CGPoint) {
     state = .up
-    print("[M@] heard press canceled")
+    
+    // MARK: THIS IS NOT CORRECT!
+    // we need to test if it was our button that was released
+//    action(index)
+//    print("[M@] self.size", self.size)
+//    print("[M@] self.frame", self.frame)
+//    print("[M@] location", location )
+//    let touchedNode = self.atPoint(location)
+//    if touchedNode == labelNode || touchedNode == self {
+//      print("[M@] *****   IT WAS WE")
+//    }
   }
 }

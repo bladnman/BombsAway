@@ -7,27 +7,97 @@
 
 import Foundation
 class GameStore {
-  var playerStores = [PlayerStore]()
   var gameSettings = GameSettings()
 
-  // calculateds
-  var currentTurn: GameTurn? { playerStores.first(where: {$0.player.currentTurn != nil})?.player.currentTurn }
   
-  func playerStoreForId(_ playerId: Int) -> PlayerStore? {
-    return playerStores.first(where: {$0.player.playerId == playerId })
+  // MARK: PLAYERS
+  var playerStores = [PlayerStore]()
+  func addPlayerStore(_ playerStore: PlayerStore) {
+    playerStores.append(playerStore)
+    playerIdTurnOrder.append(playerStore.playerId)
   }
-  func startNextTurn() {
-    let currentTurnPlayerIndex = playerStores.firstIndex(where: {$0.player.currentTurn != nil})
+  func playerStoreForId(_ playerId: Int) -> PlayerStore? {
+    return playerStores.first(where: { $0.playerId == playerId })
+  }
+  var currentTurnPlayerStore: PlayerStore? {
+    return playerStores.first(where: { $0.playerId == _currentTurn?.playerId })
+  }
+  func areAllShipsSunkForPlayerId(_ playerId: Int) -> Bool {
     
-    // clear last turn
-    if currentTurnPlayerIndex != nil {
-      playerStores[currentTurnPlayerIndex!].player.currentTurn = nil
+    if let boardStore = playerStoreForId(playerId)?.boardStore {
+      
+      // must have ships
+      guard boardStore.ships.count > 0 else {
+        return false
+      }
+      
+      for ship in boardStore.ships {
+        if !boardStore.isShipSunk(ship) {
+          return false
+        }
+      }
+
+      // no un-sunk ships
+      return true
     }
     
+    // no board store
+    return false
+  }
+  var nextTurnPlayerStore: PlayerStore? {
+    let nextPlayerId = getNextPlayerId()
+    return playerStores.first(where: { $0.playerId == nextPlayerId })
+  }
+  
+  // MARK: TURNS
+  var _currentTurn: GameTurn?
+  var lastTurn: GameTurn?
+  var currentTurn: GameTurn {
+    if _currentTurn == nil {
+      startNextTurn()
+    }
+    return _currentTurn!
+  }
+  var playerIdTurnOrder = [Int]()
+  func startNextTurn() {
+    if let nextPlayer = nextTurnPlayerStore {
+      _currentTurn = GameTurn(playerId: nextPlayer.playerId)
+      _currentTurn?.totalActionCount = nextPlayer.actionsPerTurn
+    }
+  }
+  func getNextPlayerId() -> Int {
+    let currentTurnPlayerId = currentTurnPlayerStore?.playerId
+    let finalTurnPlayerId = playerIdTurnOrder[playerIdTurnOrder.count - 1]
+    let loopToFirstPlayer = (currentTurnPlayerId == nil || currentTurnPlayerId == finalTurnPlayerId)
     // move to next player
-    let nextIdx = currentTurnPlayerIndex == nil || currentTurnPlayerIndex! == playerStores.count - 1 ? 0 : currentTurnPlayerIndex! + 1
+    var nextPlayerId = playerIdTurnOrder[0]
     
-    let gameTurn = GameTurn(playerId: playerStores[nextIdx].player.playerId)
-    playerStores[nextIdx].player.currentTurn = gameTurn
+    // find next index if not first player
+    if loopToFirstPlayer == false {
+      let currentPlayerTurnIdx = playerIdTurnOrder.firstIndex(of: currentTurnPlayerId!)
+      nextPlayerId = playerIdTurnOrder[1 + currentPlayerTurnIdx!]
+    }
+    return nextPlayerId
+  }
+  
+
+  // MARK: BOARD
+  var currentPlayerId: Int { currentTurn.playerId }
+  var currentPlayerBoard: Board? {
+    if let playerStore = currentTurnPlayerStore {
+      return playerStore.boardStore.boardRef
+    }
+    
+    return nil
+  }
+  var currentPlayerAttackingBoard: Board? {
+    if let playerStore = currentTurnPlayerStore {
+      let targetPlayerId = playerStore.targetPlayerId
+      if let targetPlayerStore = playerStoreForId(targetPlayerId) {
+        return targetPlayerStore.boardStore.boardRef
+      }
+    }
+    
+    return nil
   }
 }

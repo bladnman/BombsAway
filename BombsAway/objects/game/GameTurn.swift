@@ -6,36 +6,28 @@
 //
 
 import SceneKit
-
 class GameTurn: CustomStringConvertible {
-  var actions = [GameAction]()
-  var isOver = false
-  var board: Board?
   var playerId: Int
-  
-  var nextActionType = GameActionType.none { didSet { update() }}
-  var nextActionGridPoint: GridPoint? { didSet { update() }}
+  var totalActionCount: Int = 0
+  var actions = [GameAction]()
+
+  // calculateds
+  var isOver: Bool { actions.count >= totalActionCount }
   
   init(playerId: Int) {
     self.playerId = playerId
   }
-  
-  
-  func update() {
-    
-    // set our board mode
-    board?.mode = nextActionType
-    
-    // ACTION COMPLETE
-    if nextActionType != .none && nextActionGridPoint != nil {
-      let nextAction = GameAction(nextActionType, nextActionGridPoint)
-      board?.performAction(nextAction)
-      actions.append(nextAction)
-      clearNextAction()
+  func cancelRemainingActions() {
+    if actions.count < totalActionCount {
+      for _ in actions.count...totalActionCount {
+        actions.append(GameAction.canceled)
+      }
     }
   }
-  func clearNextAction() {
-    nextActionType = .none
-    nextActionGridPoint = nil
+  func actionForIndex(_ index: Int) -> GameAction? {
+    if actions.count >= index + 1 {
+      return actions[index]
+    }
+    return nil
   }
 }

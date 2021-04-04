@@ -12,7 +12,7 @@ enum TouchPhase {
   case start, end
 }
 enum GameActionType {
-  case none, shoot, probe, move
+  case none, shoot, probe, move, canceled
 }
 
 
@@ -62,18 +62,34 @@ func gridPointsFor(boardRange: BoardRange) -> [GridPoint] {
 
 
 struct Models {
-  static let blueCoin: SCNNode = loadNodeFromSCNScene(sceneName: "art.scnassets/coin-test.scn", nodeName: "cointest")!
-  static let redCoin: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/coin-test-red.scn", nodeName: "cointest")!
+  static let _blueCoin: SCNNode = loadNodeFromSCNScene(sceneName: "art.scnassets/coin-test.scn", nodeName: "cointest")!
+  static let _redCoin: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/coin-test-red.scn", nodeName: "cointest")!
   static let boardCell: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/Base.scn", nodeName: "node")!
   static let cellFloor: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/Floor.scn", nodeName: C_OBJ_NAME.cellFloor)!
-  static let selectableIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/SelectableIndicator.scn", nodeName: "node")!
+  static let _selectableIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/SelectableIndicator.scn", nodeName: "node")!
   static let cellProbe: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/Probe.scn", nodeName: "node")!
   static let attackShip: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/AttackShip.scn", nodeName: "node")!
   static let _probabilityIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/ProbabilityIndicator.scn", nodeName: "base")!
   static let _missIndicator: SCNNode = loadNodeFromSCNScene(sceneName: "boardCell.scnassets/MissIndicator.scn", nodeName: "base")!
   
   static var probabilityIndicator: ProbabilityIndicator { ProbabilityIndicator(ScnUtils.deepCopyNode(_probabilityIndicator)) }
-  static var missIndicator: SCNNode { ScnUtils.deepCopyNode(_missIndicator) }
+  static var selectableIndicator: SCNNode { ScnUtils.deepCopyNode(_selectableIndicator) }
+  static var missIndicator: SCNNode {
+    let node = ScnUtils.deepCopyNode(_missIndicator)
+    node.name = C_OBJ_NAME.missIndicator
+    return node
+  }
+  static var redCoin: SCNNode {
+    let node = ScnUtils.deepCopyNode(_redCoin)
+    node.name = C_OBJ_NAME.sunkCoin
+    return node
+  }
+  static var blueCoin: SCNNode {
+    let node = ScnUtils.deepCopyNode(_blueCoin)
+    node.name = C_OBJ_NAME.hitCoin
+    return node
+  }
+  
 }
 func loadNodeFromSCNScene(sceneName: String, nodeName: String) -> SCNNode? {
   if let scene = SCNScene(named: sceneName) {

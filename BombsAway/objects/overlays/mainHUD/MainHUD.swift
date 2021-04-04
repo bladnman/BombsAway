@@ -12,11 +12,22 @@ protocol MainHUDProtocol {
   func mainHUDMovePressed()
   func mainHUDProbePressed()
   func mainHUDShootPressed()
+  func mainHUDMoveToNextPlayerPressed()
+  func mainHUDHandoffCompletePressed()
 }
+enum MainHUDState {
+  case turn, endOfTurn, handoff, victory
+}
+let marginHoriz: CGFloat = 50
+let marginVert: CGFloat = 50
 class MainHUD: SKScene {
   var hudDelegate: MainHUDProtocol?
-  var nameLabel = SKLabelNode(fontNamed: "8BIT WONDER Nominal")
-  var healthNode = AttackShipHealth()
+  var nameLabel: SKLabelNode?
+  var healthNode: AttackShipHealth?
+  var overlay: SKNode?
+  var gameActionPanelGroup: GameActionPanelGroup?
+  var state: MainHUDState = .turn { didSet { setup() } }
+  
   var isHandlingTouch = false {
     didSet {
       // trying to not message twice
@@ -32,56 +43,183 @@ class MainHUD: SKScene {
       }
     }
   }
-  var player: Player? { didSet { update() }}
+  var gameStore: GameStore { didSet { setup() }}
+  var playerStore: PlayerStore { didSet { setup() }}
   
   // MARK: MAIN FOR NOW
-  convenience init(size:CGSize, delegate:MainHUDProtocol) {
-    self.init(size: size)
+  init(gameStore: GameStore, playerStore: PlayerStore, size:CGSize, delegate:MainHUDProtocol) {
+    
+    self.playerStore = playerStore
+    self.gameStore = gameStore
+    
+    super.init(size: size)
     self.isUserInteractionEnabled = true
     self.hudDelegate = delegate
+    
     setup()
   }
+  
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   func setup() {
-    addGameActionPanelGroup()
-    addPlayerHealth()
-    addPlayerName()
+    removeAllChildren()
+    
+    switch state {
+    case .turn:
+      setupForTurn()
+    case .endOfTurn:
+      setupForEndOfTurn()
+    case .handoff:
+      setupForHandoff()
+    case .victory:
+      setupForVictory()
+    }
     
     update()
   }
+  func setupForTurn() {
+    addGameActionPanelGroup()
+    addPlayerHealth()
+    addPlayerName()
+  }
+  func setupForEndOfTurn() {
+    addOverlay()
+    addPlayerHealth()
+    addPlayerName()
+    addEndOfTurnButton()
+  }
+  func setupForHandoff() {
+    addOverlay()
+    addHandoffButton()
+  }
+  func setupForVictory() {
+    addOverlay()
+    addVictoryButton()
+  }
+  
   func update() {
-    if let player = self.player {
-      // update player name
-      nameLabel.text = player.name
-      
-      // update health
-      healthNode.health = player.hitPoints
-      healthNode.maxHealth = player.hitPointsMax
-      
+    let playerStore = self.playerStore
+    
+    // update health
+    if let healthNode = self.healthNode {
+      healthNode.health = playerStore.hitPoints
+      healthNode.maxHealth = playerStore.hitPointsMax
     }
     
-    
+    gameActionPanelGroup?.update()
   }
   func addPlayerHealth() {
-    addChild(healthNode)
-    let hWidth = healthNode.frame.size.width
-    let hHeight = healthNode.frame.size.height
-    healthNode.position = CGPoint(x: size.width - 50.0 - hWidth/2, y: 50.0 + hHeight/2)
+    healthNode = AttackShipHealth()
+    if let healthNode = self.healthNode {
+      addChild(healthNode)
+      let hWidth = healthNode.frame.size.width
+      let hHeight = healthNode.frame.size.height
+      healthNode.position = CGPoint(x: size.width - marginHoriz - hWidth/2, y: marginVert + hHeight/2)
+    }
   }
   func addGameActionPanelGroup() {
-    let allPanelsNode = GameActionPanelGroup(delegate: self);
+    gameActionPanelGroup = GameActionPanelGroup(gameStore: gameStore, playerStore: playerStore, delegate: self);
     let x:CGFloat = frame.midX
-    let y:CGFloat = allPanelsNode.frame.size.height/2 + 20.0
-    allPanelsNode.position = CGPoint(x: x, y: y)
-    addChild(allPanelsNode)
-    allPanelsNode.setScale(0.7)
+    let y:CGFloat = gameActionPanelGroup!.frame.size.height/2 + 20.0
+    gameActionPanelGroup!.position = CGPoint(x: x, y: y)
+    addChild(gameActionPanelGroup!)
+    gameActionPanelGroup!.setScale(0.7)
   }
   func addPlayerName() {
-    nameLabel.text = "player name"
-    nameLabel.fontSize = 15.0
-    addChild(nameLabel)
+    nameLabel = SKLabelNode(fontNamed: "8BIT WONDER Nominal")
+    if let nameLabel = self.nameLabel {
+      nameLabel.text = playerStore.name
+      nameLabel.fontSize = 15.0
+      addChild(nameLabel)
+      
+      let hHeight = healthNode?.frame.size.height ?? 0
+      let hX = healthNode != nil ? healthNode!.position.x : marginHoriz
+      let hY = healthNode != nil ? healthNode!.position.y : marginVert
+      nameLabel.position = CGPoint(x: hX, y: hY + hHeight)
+    }
     
-    let hHeight = healthNode.frame.size.height
-    nameLabel.position = CGPoint(x: healthNode.position.x, y: healthNode.position.y + hHeight)
+  }
+  func addEndOfTurnButton() {
+    
+    let turnOverLabel = SKLabelNode(fontNamed: "8BIT WONDER Nominal")
+    turnOverLabel.text = "Turn Over"
+    turnOverLabel.fontSize = 30.0
+    addChild(turnOverLabel)
+    turnOverLabel.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+    
+    let nextPlayerNameLabel = SKLabelNode(fontNamed: "8BIT WONDER Nominal")
+    nextPlayerNameLabel.text = "Up next: " + (gameStore.nextTurnPlayerStore?.name ?? "")
+    nextPlayerNameLabel.fontSize = 20.0
+    addChild(nextPlayerNameLabel)
+    nextPlayerNameLabel.position = CGPoint(x: self.frame.midX, y: self.frame.midY - 40.0)
+    
+    func handlePress(_ buttonIndex: Int) {
+      hudDelegate?.mainHUDMoveToNextPlayerPressed()
+    }
+    
+    let button = LabelButton(text: "Understood", size: CGSize(width: 250.0, height: 100), action: handlePress, index: 0)
+    button.color = C_COLOR.green
+    addChild(button)
+    button.position = CGPoint(x: self.frame.midX, y: self.frame.midY - 200.0)
+    
+  }
+  func addHandoffButton() {
+    let turnOverLabel = SKLabelNode(fontNamed: "8BIT WONDER Nominal")
+    turnOverLabel.text = "HANDOFF"
+    turnOverLabel.fontSize = 50.0
+    addChild(turnOverLabel)
+    turnOverLabel.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+    
+    let nextPlayerNameLabel = SKLabelNode(fontNamed: "8BIT WONDER Nominal")
+    nextPlayerNameLabel.text = "Pass device to: " + (gameStore.nextTurnPlayerStore?.name ?? "")
+    nextPlayerNameLabel.fontSize = 30.0
+    addChild(nextPlayerNameLabel)
+    nextPlayerNameLabel.position = CGPoint(x: self.frame.midX, y: self.frame.midY - 60.0)
+    
+    func handlePress(_ buttonIndex: Int) {
+      hudDelegate?.mainHUDHandoffCompletePressed()
+    }
+    
+    let button = LabelButton(text: "Start My Turn", size: CGSize(width: 250.0, height: 100), action: handlePress, index: 0)
+    button.color = C_COLOR.green
+    addChild(button)
+    button.position = CGPoint(x: self.frame.midX, y: self.frame.midY - 300.0)
+    
+  }
+  func addVictoryButton() {
+    let turnOverLabel = SKLabelNode(fontNamed: "8BIT WONDER Nominal")
+    turnOverLabel.text = "W I N N E R"
+    turnOverLabel.fontSize = 50.0
+    addChild(turnOverLabel)
+    turnOverLabel.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+    
+    let nextPlayerNameLabel = SKLabelNode(fontNamed: "8BIT WONDER Nominal")
+    nextPlayerNameLabel.text = gameStore.currentTurnPlayerStore?.name ?? "unknown"
+    nextPlayerNameLabel.fontSize = 30.0
+    addChild(nextPlayerNameLabel)
+    nextPlayerNameLabel.position = CGPoint(x: self.frame.midX, y: self.frame.midY - 60.0)
+    
+//    func handlePress(_ buttonIndex: Int) {
+//      hudDelegate?.mainHUDHandoffCompletePressed()
+//    }
+//    
+//    let button = LabelButton(text: "Play Again", size: CGSize(width: 250.0, height: 100), action: handlePress, index: 0)
+//    button.color = C_COLOR.green
+//    addChild(button)
+//    button.position = CGPoint(x: self.frame.midX, y: self.frame.midY - 300.0)
+    
+  }
+  func addOverlay() {
+    overlay?.removeFromParent()
+    
+    let overlayNode = SKShapeNode(rect: CGRect(origin: CGPoint.zero, size: size) )
+    overlayNode.fillColor = UIColor.black
+    overlayNode.alpha = 0.7
+    overlayNode.zPosition = -1
+    addChild(overlayNode)
+    
+    self.overlay = overlayNode
   }
 }
 

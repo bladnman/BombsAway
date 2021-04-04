@@ -42,9 +42,12 @@ struct Constants {
       static let label = "label"
       static let origin = "origin"
       static let pivot = "pivot"
-      static let hitcoin = "hitcoin"
+      static let hitCoin = "hitCoin"
+      static let sunkCoin = "sunkCoin"
+      static let missIndicator = "missIndicator"
       static let attackBoard = "attackBoard"
       static let defendBoard = "defendBoard"
+      static let actionPanel = "actionPanel"
     }
   }
   struct Cell {
@@ -88,13 +91,15 @@ struct Constants {
   }
   struct Player {
     static let startingHealth = 3
-    static let startingActionsPerTurn = 7
-    static let shipSizeArray = [5,4,3,3,2,2,2]
+    static let startingActionsPerTurn = 3
+//    static let shipSizeArray = [2,2]
+//    static let shipSizeArray = [5,4,3,3,2,2,2]
+    static let shipSizeArray = [5,4,3,3,2]
+    static let respawnLosesTurn = true
   }
   struct Movement {
     struct Player {
-      static let initialStepsPerMove = 5
-      static let initialMoveRadius = 3
+      static let initialMoveRadius = 2
       static let initialProbeRadius = 3
       static let initialShootRadius = 3
       static let perCellSec = 0.05

@@ -11,17 +11,18 @@ import SpriteKit
 import UIKit
 
 class GameViewController: UIViewController {
-  
   var scene: SCNScene!
   var sceneView: SCNView!
 
   var gameStore = GameStore()
-  var player: Player!
   var nextAction: GameAction?
-  var currentTurn = GameTurn(playerId: -1)
+
+  // holders for next action, until action is complete
+  var nextActionType = GameActionType.none
+  var nextActionGridPoint: GridPoint?
   
-  var offenseBoard: Board!
-  var defenseBoard: Board!
+  var farBoard: Board!
+  var nearBoard: Board!
   var gameHUD: MainHUD?
   
   var playerNode: SCNNode!
@@ -35,6 +36,7 @@ class GameViewController: UIViewController {
     super.viewDidLoad()
     initializeGame()
   }
+
   func initializeGame() {
     createNewScene()
   }
@@ -55,44 +57,100 @@ class GameViewController: UIViewController {
   }
 }
 
+// MARK: GAME LIFECYCLE
 
-// MARK: OVERLAY DELEGATE
-extension GameViewController: MainHUDProtocol {
-  func mainHUDMovePressed() {
-    currentTurn.nextActionType = .move
+extension GameViewController {
+  func lifeCy_beginTurn() {
+    gameStore.startNextTurn()
+    
+    // MARK: this is temporarily rushing to next attack
+    if let currentTurnPlayerStore = gameStore.currentTurnPlayerStore {
+      gameHUD?.playerStore = currentTurnPlayerStore
+    }
+    
+    // we need boards! (pass and play they are destroyed)
+    if farBoard == nil {
+      createAllBoards()
+    }
+    
+    lifeCy_beginAttack()
+    
+    // MARK: replay last turn
+    // MARK: begin attack
   }
-  func mainHUDProbePressed() {
-    currentTurn.nextActionType = .probe
+  func lifeCy_endTurn() {
+    gameStore.currentTurn.cancelRemainingActions()
+    gameHUD?.state = .endOfTurn
   }
-  func mainHUDShootPressed() {
-    currentTurn.nextActionType = .shoot
+  func lifeCy_startPassAndPlayHandoff() {
+    gameHUD?.state = .handoff
+    
+    // tear down boards
+    removeAllBoards()
   }
-  func mainHUDHandledTouchStart() {
-    // noop
+  func lifeCy_endPassAndPlayHandoff() {
+    lifeCy_beginTurn()
   }
-  func mainHUDHandledTouchEnd() {
-    // noop
+  func lifeCy_playLastTurn() {
+  }
+  func lifeCy_beginAttack() {
+    gameHUD?.state = .turn
+    if let currentTurnPlayerStore = gameStore.currentTurnPlayerStore {
+      
+      // MARK: RESPAWN
+      if currentTurnPlayerStore.isDead {
+        currentTurnPlayerStore.hitPoints = currentTurnPlayerStore.hitPointsMax
+        gameStore.currentPlayerAttackingBoard?.respawn()
+        
+        if C_PLAYER.respawnLosesTurn {
+          lifeCy_endTurn()
+        }
+        
+        gameHUD?.update()
+      }
+    }
+  }
+  func lifeCy_victory() {
+    gameHUD?.state = .victory
   }
 }
 
-
 // MARK: BOARD DELEGATE
+
 extension GameViewController: BoardProtocol {
-  func boardSubstantialChage(board: Board) {
-    // MARK: DEAD
-    print("[M@] CHECK FOR DEAD A NEW WAY BUB")
-//    if board.attacker.isDead {
-//      currentTurn.isOver = true
-//    }
+  func boardActionComplete(gameAction: GameAction, board: Board) {
+    if let targetPlayer = gameStore.playerStoreForId(gameAction.actionTargetId) {
+      if let attackingPlayer = gameStore.playerStoreForId(gameAction.actionOwnerId) {
+        
+        // MARK: VICTORY
+        if gameStore.areAllShipsSunkForPlayerId(targetPlayer.playerId) {
+          lifeCy_victory()
+        }
+    
+        // MARK: DEAD
+        else if attackingPlayer.isDead {
+          board.killAttacker()
+          
+          // MARK: todo want to wait until attacker is dead...
+
+          // maybe a completion callback?
+          lifeCy_endTurn()
+        }
+        
+        // MARK: CURRENT TURN OVER - NO MORE ACTIONS
+        else if gameStore.currentTurn.isOver {
+          lifeCy_endTurn()
+        }
+      }
+    }
     
     gameHUD?.update()
   }
 }
 
-
 // MARK: SCENE UPDATE DELEGATE
+
 extension GameViewController: SCNSceneRendererDelegate {
-  
   func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
     // noop
   }

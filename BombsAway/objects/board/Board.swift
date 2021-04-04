@@ -15,7 +15,7 @@ enum BoardType {
   case offense, defense
 }
 protocol BoardProtocol {
-  func boardSubstantialChage(board: Board)
+  func boardActionComplete(gameAction: GameAction, board: Board)
 }
 class Board: SCNNode {
   let gameStore: GameStore
@@ -58,10 +58,10 @@ class Board: SCNNode {
     
     // - - - - - - - - - - - - - - -
     // MARK: RISK : PLAYER IDs MUST EXIST
-    self.boardStore = gameStore.playerStoreForId(ownerId)!.boardStore
-    self.attackShip = AttackShip(player: gameStore.playerStoreForId(viewerId)!.player)
+    let playerStore = gameStore.playerStoreForId(ownerId)!
+    self.boardStore = playerStore.boardStore
+    self.attackShip = AttackShip(playerStore: playerStore)
     // - - - - - - - - - - - - - - -
-    
     
     self.top = CGFloat(boardSize.rows)
     self.right = CGFloat(boardSize.columns)
@@ -96,22 +96,24 @@ class Board: SCNNode {
     }
   }
   func performAction(_ gameAction: GameAction) {
-    switch gameAction.type {
-    case .move:
-      if let gp = gameAction.gridPoint {
-        stepAttackShipTo(gp)
+    
+    DispatchQueue.main.async {
+      switch gameAction.type {
+      case .move:
+        if let gp = gameAction.gridPoints.first {
+          self.stepAttackShipTo(gp, gameAction: gameAction)
+        }
+      case .probe:
+        for gridPoint in gameAction.gridPoints {
+          self.sendProbeTo(gridPoint, gameAction: gameAction)
+        }
+      case .shoot:
+        for gridPoint in gameAction.gridPoints {
+          self.sendShotTo(gridPoint, gameAction: gameAction)
+        }
+      default:
+        break
       }
-    case .probe:
-      if let gp = gameAction.gridPoint {
-        sendProbeTo(gp)
-      }
-    case .shoot:
-      if let gp = gameAction.gridPoint {
-        sendShotTo(gp)
-      }
-     
-    default:
-      break
     }
   }
 
@@ -137,7 +139,13 @@ class Board: SCNNode {
   }
   func createAttackShip() {
     boardGeom.addChildNode(attackShip)
-    attackShip.position = positionForGridPoint(boardStore.spawnPoint)
+    // put ship in player's position or spawnpoint
+    if attackShip.playerStore.gridPoint != GridPoint.zero {
+      attackShip.position = positionForGridPoint(attackShip.playerStore.gridPoint)
+    } else {
+      attackShip.position = positionForGridPoint(boardStore.spawnPoint)
+      attackShip.playerStore.gridPoint = boardStore.spawnPoint
+    }
   }
   func createShips() {
     for shipData in boardStore.ships {
@@ -148,13 +156,15 @@ class Board: SCNNode {
   // MARK: UPDATERS
   func update() {
     clearCellModes()
+    
+    let attackingPlayerStore = attackShip.playerStore
     switch mode {
     case .move:
-      drawAvailableZone(radius: attackShip.player.moveRadius, mode: .move)
+      drawAvailableZone(radius: attackingPlayerStore.moveRadius, mode: .move)
     case .probe:
-      drawAvailableZone(radius: attackShip.player.probeRadius, mode: .probe)
+      drawAvailableZone(radius: attackingPlayerStore.probeRadius, mode: .probe)
     case .shoot:
-      drawAvailableZone(radius: attackShip.player.shootRadius, mode: .shoot)
+      drawAvailableZone(radius: attackingPlayerStore.shootRadius, mode: .shoot)
     default:
       break
     }
@@ -185,6 +195,15 @@ class Board: SCNNode {
     }
   }
 
+  func respawn() {
+    attackShip.position = positionForGridPoint(boardStore.spawnPoint)
+    attackShip.playerStore.gridPoint = boardStore.spawnPoint
+    attackShip.animateRespawn()
+  }
+  func killAttacker() {
+    attackShip.animateDeath()
+  }
+  
   @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")

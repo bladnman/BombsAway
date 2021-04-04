@@ -13,7 +13,6 @@
 		6C16970E25F5974A00596637 /* Board+structs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C16970D25F5974A00596637 /* Board+structs.swift */; };
 		6C16971225F59C2600596637 /* Board+positioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C16971125F59C2600596637 /* Board+positioning.swift */; };
 		6C39ED6E25F9A1CB005BF5C2 /* SCNNode+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C39ED6D25F9A1CB005BF5C2 /* SCNNode+ext.swift */; };
-		6C4232F3260C15050010FED9 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4232F2260C15050010FED9 /* Player.swift */; };
 		6C4232FD260CD1240010FED9 /* BombsAwayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4232FC260CD1240010FED9 /* BombsAwayTests.swift */; };
 		6C43149A25F8F8B900092D54 /* TargetShip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C43149925F8F8B900092D54 /* TargetShip.swift */; };
 		6C4D5606260E0B7E00A7FD9A /* 8-BIT WONDER.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 6C4D5605260E0B7700A7FD9A /* 8-BIT WONDER.TTF */; };
@@ -75,7 +74,6 @@
 		6C16970D25F5974A00596637 /* Board+structs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Board+structs.swift"; sourceTree = "<group>"; };
 		6C16971125F59C2600596637 /* Board+positioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Board+positioning.swift"; sourceTree = "<group>"; };
 		6C39ED6D25F9A1CB005BF5C2 /* SCNNode+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNNode+ext.swift"; sourceTree = "<group>"; };
-		6C4232F2260C15050010FED9 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		6C4232FA260CD1240010FED9 /* BombsAwayTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BombsAwayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C4232FC260CD1240010FED9 /* BombsAwayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BombsAwayTests.swift; sourceTree = "<group>"; };
 		6C4232FE260CD1240010FED9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -274,7 +272,6 @@
 			isa = PBXGroup;
 			children = (
 				6C8364F425F70EEE00A6E4AD /* AttackShip.swift */,
-				6C4232F2260C15050010FED9 /* Player.swift */,
 			);
 			path = player;
 			sourceTree = "<group>";
@@ -470,7 +467,6 @@
 				6CE46A1F260FB3C000D26656 /* GameStore.swift in Sources */,
 				6C4DD45F26002C9500832788 /* BoardCell+cellProbabilityDelegate.swift in Sources */,
 				6C39ED6E25F9A1CB005BF5C2 /* SCNNode+ext.swift in Sources */,
-				6C4232F3260C15050010FED9 /* Player.swift in Sources */,
 				6C16970A25F5971300596637 /* Board+tests.swift in Sources */,
 				6C6BEFFD260AAEFE005E28B2 /* NSObject+CustomStringConvertable.swift in Sources */,
 				6CB80F5E26081962008B5376 /* AttackShipHealth.swift in Sources */,

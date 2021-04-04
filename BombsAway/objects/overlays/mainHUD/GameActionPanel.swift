@@ -23,6 +23,7 @@ class GameActionPanel: SKNode {
   let moveIcon: SKSpriteNode!
   let probeIcon: SKSpriteNode!
   let shootIcon: SKSpriteNode!
+  let canceledIcon: SKSpriteNode!
   var delegate: GameActionPanelDelegate?
   
   var actionType: GameActionType = .none { didSet { update() }}
@@ -46,14 +47,17 @@ class GameActionPanel: SKNode {
   var halfSize: CGFloat { fullSize/2 }
   override var frame: CGRect { background.frame }
 
-  convenience init(delegate: GameActionPanelDelegate) {
+  convenience init(delegate: GameActionPanelDelegate, actionType: GameActionType = .none) {
     self.init()
     self.delegate = delegate
+    self.actionType = actionType
+    update()
   }
   override init() {
     self.moveIcon = SKSpriteNode(imageNamed: "art.scnassets/move icon")
     self.probeIcon = SKSpriteNode(imageNamed: "art.scnassets/probe icon")
     self.shootIcon = SKSpriteNode(imageNamed: "art.scnassets/shoot icon")
+    self.canceledIcon = SKSpriteNode(imageNamed: "art.scnassets/not icon")
     fullSize = moveIcon.size.width
     let halfSize = fullSize/2
 
@@ -73,6 +77,7 @@ class GameActionPanel: SKNode {
     addChild(moveIcon)
     addChild(probeIcon)
     addChild(shootIcon)
+    addChild(canceledIcon)
     update()
   }
   func update() {
@@ -87,6 +92,7 @@ class GameActionPanel: SKNode {
     moveIcon.alpha = 1.0
     probeIcon.alpha = 1.0
     shootIcon.alpha = 1.0
+    canceledIcon.alpha = 0.0
     
     moveIcon.position = CGPoint(x: 0.0, y: (halfSize) + iconPadding)
     probeIcon.position = CGPoint(x:0.0, y: 0.0)
@@ -95,23 +101,27 @@ class GameActionPanel: SKNode {
     moveIcon.scale(to: CGSize(width: halfSize, height: halfSize))
     probeIcon.scale(to: CGSize(width: halfSize, height: halfSize))
     shootIcon.scale(to: CGSize(width: halfSize, height: halfSize))
+    
+    background.alpha = 1.0
   }
   func setTakenLayout() {
     moveIcon.alpha = 0.0
     probeIcon.alpha = 0.0
     shootIcon.alpha = 0.0
+    canceledIcon.alpha = 0.0
     
     var icon = moveIcon
     switch actionType {
     case .move: icon = moveIcon
     case .probe: icon = probeIcon
     case .shoot: icon = shootIcon
-    default: break
+    case .canceled: icon = canceledIcon
+    case .none: break
     }
     
     icon?.position = CGPoint.zero
     icon?.scale(to: CGSize(width: fullSize, height: fullSize))
-    icon?.alpha = 0.7
+    icon?.alpha = actionType == GameActionType.canceled ? 0.3 : 0.7
     background.alpha = 0.7
   }
   
